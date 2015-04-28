@@ -36,13 +36,18 @@ function getName($number) {
 	global $conf;
 
 	$uAPIKey = $_REQUEST['apikey'];
+	$uClient = $_REQUEST['client'];
+	$uCIP = $_SERVER['REMOTE_ADDR'];
 
-	if ($uAPIKey)
+	if ($uAPIKey && $uClient && $uCIP)
 	{
 		if ($conf['db']['type'] == 'postgres')
 		{
 			$db = pg_connect('dbname='.$conf['db']['database']);
-
+			$query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid = tariff.id where apikey = '{$uAPIKey}'";
+			$result = pg_query($query);
+			$uid = pg_fetch_result($result, 0, 'id');
+			$
 		}
 	} else {
 		return json_encode(array('error' => 2, 'message' => 'Not found API access key.'));

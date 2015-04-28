@@ -56,7 +56,8 @@ function getName($number) {
 				'price' => $price,
 				'apikey' => $uAPIKey,
 				'client' => $uClient,
-				'ip' => $uCIP
+				'ip' => $uCIP,
+				'result' => $result
 			);
 			pg_close($db);
 		}

@@ -44,7 +44,7 @@ function getName($number) {
 
 	$uAPIKey = $_REQUEST['apikey'];
 	$uClient = $_REQUEST['client'];
-	$uCIP = $_SERVER['REMOTE_ADDR'];
+	$uCIP = sprintf("%u", ip2long($_SERVER['REMOTE_ADDR']));
 
 	if ($uAPIKey && $uClient && $uCIP && is_numeric($number))
 	{
@@ -61,7 +61,7 @@ function getName($number) {
 				if ($qty) {
 					$query = "update users set qty = qty - 1 where id = {$uid}";
 					pg_query($query);
-					$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, {$uClient}, {$uCIP})";
+					$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
 					pg_query($query);
 				}
 			} else {

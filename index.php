@@ -72,8 +72,28 @@ function getName($number) {
 					} else {
 						$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
 						array_multisort($phones_masks, SORT_DESC);
-						header('Content-Type: text/plain');
-						print_r($phones_masks);
+						foreach ($phones_masks as $masks) {
+							foreach ($masks as $key => $value) {
+								$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
+								preg_match($pattern, $value['mask'], $mask)
+								if ($mask == substr($number, 1, 5)) {
+									if ($value['city'])) {
+										if (count($value['city'] == 1) {
+											$city = $value['city'];
+											break 2;
+										} else {
+											$city = $value['city'][0];
+											break 2;
+										}
+									} else {
+										$city = $value['region'];
+										break 2;
+									}
+								}
+							}
+						}
+						header("Content-Type: text/plain");
+						echo $city;
 						die();
 						// for ($i = 0; $i < count($phones_masks); $i++) {
 						// 	$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";

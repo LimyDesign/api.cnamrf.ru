@@ -45,11 +45,11 @@ function getName($number) {
 
 		}
 	} else {
-		return json_encode(array('error' => '2', 'message' => 'Not found API access key.'));
+		return json_encode(array('error' => 2, 'message' => 'Not found API access key.'));
 	}
 }
 
 function defaultResult() {
-	return json_encode(array('error' => '1', 'message' => 'Failed requests to the API interface.'));
+	return json_encode(array('error' => 1, 'message' => 'Failed requests to the API interface.'));
 }
 ?>

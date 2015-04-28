@@ -55,6 +55,7 @@ function getName($number) {
 				'qty' => $qty,
 				'price' => $price
 			);
+			pg_close($db);
 		}
 		return json_encode($json_return);
 	} else {

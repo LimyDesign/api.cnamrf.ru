@@ -93,7 +93,7 @@ function getName($number) {
 							}
 						}
 						header("Content-Type: text/plain");
-						echo $city;
+						var_dump($city);
 						die();
 						// for ($i = 0; $i < count($phones_masks); $i++) {
 						// 	$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";

@@ -72,7 +72,9 @@ function getName($number) {
 					} else {
 						$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
 						array_multisort($phones_masks, SORT_DESC);
-						$json_return = $phones_masks;
+						header('Content-Type: text/plain');
+						print_r($phones_masks);
+						die();
 						// for ($i = 0; $i < count($phones_masks); $i++) {
 						// 	$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
 						// 	preg_match($pattern, $phones_masks[$i]['mask'], $mask[$i]);

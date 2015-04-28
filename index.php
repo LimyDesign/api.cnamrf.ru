@@ -74,51 +74,48 @@ function getName($number) {
 						$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
 						array_multisort($phones_masks, SORT_DESC);
 						foreach ($phones_masks as $masks) {
-							// foreach ($masks as $key => $value) {
-								var_dump($masks);
-								$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
-								preg_match($pattern, $masks['mask'], $mask);
-								if ($mask[3] == substr($number, 1, 5)) {
-									if ($masks['city']) {
-										if (count($masks['city']) == 1) {
-											$city = $masks['city'];
-											break;
-										} else {
-											$city = $masks['city'][0];
-											break;
-										}
+							$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
+							preg_match($pattern, $masks['mask'], $mask);
+							if ($mask[3] == substr($number, 1, 5)) {
+								if ($masks['city']) {
+									if (count($masks['city']) == 1) {
+										$city = $masks['city'];
+										break;
 									} else {
-										$city = $masks['region'];
-										break 2;
-									}
-								} elseif ($mask[2] == substr($number, 1, 4)) {
-									if ($masks['city']) {
-										if (count($masks['city']) == 1) {
-											$city = $masks['city'];
-											break;
-										} else {
-											$city = $masks['city'][0];
-											break;
-										}
-									} else {
-										$city = $masks['region'];
+										$city = $masks['city'][0];
 										break;
 									}
-								} elseif ($mask[1] == substr($number, 1, 3)) {
-									if ($masks['city']) {
-										if (count($masks['city']) == 1) {
-											$city = $masks['city'];
-											break;
-										} else {
-											$city = $masks['city'][0];
-											break;
-										}
-									} else {
-										$city = $masks['region'];
-										break 2;
-									}
+								} else {
+									$city = $masks['region'];
+									break 2;
 								}
-							// }
+							} elseif ($mask[2] == substr($number, 1, 4)) {
+								if ($masks['city']) {
+									if (count($masks['city']) == 1) {
+										$city = $masks['city'];
+										break;
+									} else {
+										$city = $masks['city'][0];
+										break;
+									}
+								} else {
+									$city = $masks['region'];
+									break;
+								}
+							} elseif ($mask[1] == substr($number, 1, 3)) {
+								if ($masks['city']) {
+									if (count($masks['city']) == 1) {
+										$city = $masks['city'];
+										break;
+									} else {
+										$city = $masks['city'][0];
+										break;
+									}
+								} else {
+									$city = $masks['region'];
+									break 2;
+								}
+							}
 						}
 						var_dump($city);
 						die();

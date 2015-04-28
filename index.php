@@ -35,11 +35,18 @@ switch ($cmd[0]) {
 function getName($number) {
 	global $conf;
 
+	$number = preg_replace('/[+()-\s]/', '', $number);
+	if (substr($number, 0, 1) == '8' && strlen($number) == 11) {
+		$number = preg_replace('/^8/', '7', $number);
+	} elseif (strlen($number) == 10) {
+		$number = '7' . $number;
+	}
+
 	$uAPIKey = $_REQUEST['apikey'];
 	$uClient = $_REQUEST['client'];
 	$uCIP = $_SERVER['REMOTE_ADDR'];
 
-	if ($uAPIKey && $uClient && $uCIP)
+	if ($uAPIKey && $uClient && $uCIP && is_numeric($number))
 	{
 		if ($conf['db']['type'] == 'postgres')
 		{
@@ -50,16 +57,20 @@ function getName($number) {
 			$qty = pg_fetch_result($result, 0, 'qty');
 			$price = pg_fetch_result($result, 0, 'price');
 			pg_free_result($result);
-			$json_return = array(
-				'uid' => $uid,
-				'qty' => $qty,
-				'price' => $price,
-			);
+			if ($uid) {
+				if ($qty) {
+					$query = "update users set qty = qty - 1 where id = {$uid}";
+					pg_query($query);
+					$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$phone}, {$uClient}, {$uCIP})"
+				}
+			} else {
+				$json_return = array('error' => 3, 'message' => 'Not found any users for your API access key.');
+			}
 			pg_close($db);
 		}
 		return json_encode($json_return);
 	} else {
-		return json_encode(array('error' => 2, 'message' => 'Not found API access key.'));
+		return json_encode(array('error' => 2, 'message' => 'Not found API access key or not specified client or not specified phone number.'));
 	}
 }
 

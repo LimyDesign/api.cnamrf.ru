@@ -70,8 +70,22 @@ function getName($number) {
 						pg_query($query);
 						$json_return = array('error' => 0, 'name' => $name, 'translit' => $translit);
 					} else {
-						$url = 'http://catalog.api.2gis.ru/search?key=' . $conf['2gis']['key'];
-						$dublgis = json_decode(file_get_contents($url));
+						$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
+						array_multisort($phones_masks, SORT_DESC);
+						$json_return = $phones_masks;
+						// for ($i = 0; $i < count($phones_masks); $i++) {
+						// 	$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
+						// 	preg_match($pattern, $phones_masks[$i]['mask'], $mask[$i]);
+						// 	unset($mask[$i][0]);
+						// }
+						// rsort($mask, SORT_NUMERIC);
+						// $url = 'http://catalog.api.2gis.ru/search?';
+						// $uri = http_build_query(array(
+						// 	'key' => $conf['2gis']['key'],
+						// 	'version' => '1.3',
+						// 	'what' => $number,
+						// 	'where' => $city));
+						// $dublgis = json_decode(file_get_contents($url.$uri));
 					}
 				}
 			} else {

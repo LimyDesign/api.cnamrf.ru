@@ -1,0 +1,5 @@
+.DS_Store
+config.json
+.htaccess
+.htsecure
+deploy.php

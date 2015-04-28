@@ -75,7 +75,7 @@ function getName($number) {
 						array_multisort($phones_masks, SORT_DESC);
 						foreach ($phones_masks as $masks) {
 							foreach ($masks as $key => $value) {
-								var_dump($key)
+								var_dump($key);
 								$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
 								preg_match($pattern, $value['mask'], $mask);
 								if ($mask[3] == substr($number, 1, 5)) {

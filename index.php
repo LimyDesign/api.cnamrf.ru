@@ -70,13 +70,14 @@ function getName($number) {
 						pg_query($query);
 						$json_return = array('error' => 0, 'name' => $name, 'translit' => $translit);
 					} else {
+						header("Content-Type: text/plain");
 						$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
 						array_multisort($phones_masks, SORT_DESC);
 						foreach ($phones_masks as $masks) {
 							foreach ($masks as $key => $value) {
+								print_r($value);
 								$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
 								preg_match($pattern, $value['mask'], $mask);
-								echo $mask[2] . "\n";
 								if ($mask[3] == substr($number, 1, 5)) {
 									if ($value['city']) {
 										if (count($value['city']) == 1) {
@@ -119,7 +120,6 @@ function getName($number) {
 								}
 							}
 						}
-						header("Content-Type: text/plain");
 						var_dump($city);
 						die();
 						// for ($i = 0; $i < count($phones_masks); $i++) {

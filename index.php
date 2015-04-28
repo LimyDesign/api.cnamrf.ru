@@ -61,7 +61,8 @@ function getName($number) {
 				if ($qty) {
 					$query = "update users set qty = qty - 1 where id = {$uid}";
 					pg_query($query);
-					$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$phone}, {$uClient}, {$uCIP})"
+					$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, {$uClient}, {$uCIP})";
+					pg_query($query);
 				}
 			} else {
 				$json_return = array('error' => 3, 'message' => 'Not found any users for your API access key.');

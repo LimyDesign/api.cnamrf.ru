@@ -76,6 +76,7 @@ function getName($number) {
 							foreach ($masks as $key => $value) {
 								$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
 								preg_match($pattern, $value['mask'], $mask);
+								echo $mask . "\n";
 								if ($mask == substr($number, 1, 5)) {
 									if ($value['city']) {
 										if (count($value['city']) == 1) {

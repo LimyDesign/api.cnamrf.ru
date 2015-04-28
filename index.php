@@ -35,7 +35,7 @@ switch ($cmd[0]) {
 function getName($number) {
 	global $conf;
 
-	$uAPIKey = $_POST['apikey'];
+	$uAPIKey = $_REQUEST['apikey'];
 
 	if ($uAPIKey)
 	{

@@ -28,6 +28,8 @@ switch ($cmd[0]) {
 	case 'getName':
 		echo getName($cmd[1]);
 		break;
+	default:
+		echo defaultResult();
 }
 
 function getName($number) {
@@ -43,7 +45,11 @@ function getName($number) {
 
 		}
 	} else {
-		return json_encode(array('error' => '1', 'message' => 'Не обнаружен API ключ доступа.'));
+		return json_encode(array('error' => '2', 'message' => 'Не обнаружен API ключ доступа.'));
 	}
+}
+
+function defaultResult() {
+	return json_encode(array('error' => '1', 'message' => 'Ошибочный запрос к API интерфейсу.'));
 }
 ?>

@@ -47,8 +47,16 @@ function getName($number) {
 			$query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid = tariff.id where apikey = '{$uAPIKey}'";
 			$result = pg_query($query);
 			$uid = pg_fetch_result($result, 0, 'id');
-			$
+			$qty = pg_fetch_result($result, 0, 'qty');
+			$price = pg_fetch_result($result, 0, 'price');
+			pg_free_result($result);
+			$json_return = array(
+				'uid' => $uid,
+				'qty' => $qty,
+				'price' => $price
+			);
 		}
+		return json_encode($json_return);
 	} else {
 		return json_encode(array('error' => 2, 'message' => 'Not found API access key.'));
 	}

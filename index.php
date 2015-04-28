@@ -59,10 +59,20 @@ function getName($number) {
 			pg_free_result($result);
 			if ($uid) {
 				if ($qty) {
-					$query = "update users set qty = qty - 1 where id = {$uid}";
-					pg_query($query);
-					$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
-					pg_query($query);
+					$query = "select name, translit from phonebook where phone = {$number} and verify = true";
+					$result = pg_query($query);
+					$name = pg_fetch_result($result, 0, 'name');
+					$translit = pg_fetch_result($result, 0, 'translit');
+					if ($name && $translit) {
+						$query = "update users set qty = qty - 1 where id = {$uid}";
+						pg_query($query);
+						$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
+						pg_query($query);
+						$json_return = array('error' => 0, 'name' => $name, 'translit' => $translit);
+					} else {
+						$url = 'http://catalog.api.2gis.ru/search?key=' . $conf['2gis']['key'];
+						$dublgis = json_decode(file_get_contents($url));
+					}
 				}
 			} else {
 				$json_return = array('error' => 3, 'message' => 'Not found any users for your API access key.');

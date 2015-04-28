@@ -65,8 +65,9 @@ function getName($number) {
 					$translit = pg_fetch_result($result, 0, 'translit');
 					if ($name && $translit) {
 						$query = "update users set qty = qty - 1 where id = {$uid}";
-						pg_query($query);
+						// pg_query($query);
 						$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
+						die($query);
 						pg_query($query);
 						$json_return = array('error' => 0, 'name' => $name, 'translit' => $translit);
 					} else {

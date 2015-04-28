@@ -77,7 +77,33 @@ function getName($number) {
 								$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
 								preg_match($pattern, $value['mask'], $mask);
 								echo $mask . "\n";
-								if ($mask == substr($number, 1, 5)) {
+								if ($mask[3] == substr($number, 1, 5)) {
+									if ($value['city']) {
+										if (count($value['city']) == 1) {
+											$city = $value['city'];
+											break 2;
+										} else {
+											$city = $value['city'][0];
+											break 2;
+										}
+									} else {
+										$city = $value['region'];
+										break 2;
+									}
+								} elseif ($mask[2] == substr($number, 1, 4)) {
+									if ($value['city']) {
+										if (count($value['city']) == 1) {
+											$city = $value['city'];
+											break 2;
+										} else {
+											$city = $value['city'][0];
+											break 2;
+										}
+									} else {
+										$city = $value['region'];
+										break 2;
+									}
+								} elseif ($mask[1] == substr($number, 1, 3)) {
 									if ($value['city']) {
 										if (count($value['city']) == 1) {
 											$city = $value['city'];

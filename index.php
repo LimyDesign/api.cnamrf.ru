@@ -53,7 +53,10 @@ function getName($number) {
 			$json_return = array(
 				'uid' => $uid,
 				'qty' => $qty,
-				'price' => $price
+				'price' => $price,
+				'apikey' => $uAPIKey,
+				'client' => $uClient,
+				'ip' => $uCIP
 			);
 			pg_close($db);
 		}

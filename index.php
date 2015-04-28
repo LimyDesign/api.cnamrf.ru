@@ -65,9 +65,8 @@ function getName($number) {
 					$translit = pg_fetch_result($result, 0, 'translit');
 					if ($name && $translit) {
 						$query = "update users set qty = qty - 1 where id = {$uid}";
-						// pg_query($query);
+						pg_query($query);
 						$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
-						die($query);
 						pg_query($query);
 						$json_return = array('error' => 0, 'name' => $name, 'translit' => $translit);
 					} else {
@@ -118,21 +117,15 @@ function getName($number) {
 								}
 							}
 						}
-						var_dump($city);
+						$url = 'http://catalog.api.2gis.ru/search?';
+						$uri = http_build_query(array(
+							'key' => $conf['2gis']['key'],
+							'version' => '1.3',
+							'what' => $number,
+							'where' => $city));
+						$dublgis = json_decode(file_get_contents($url.$uri));
+						var_dump($dublgis);
 						die();
-						// for ($i = 0; $i < count($phones_masks); $i++) {
-						// 	$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
-						// 	preg_match($pattern, $phones_masks[$i]['mask'], $mask[$i]);
-						// 	unset($mask[$i][0]);
-						// }
-						// rsort($mask, SORT_NUMERIC);
-						// $url = 'http://catalog.api.2gis.ru/search?';
-						// $uri = http_build_query(array(
-						// 	'key' => $conf['2gis']['key'],
-						// 	'version' => '1.3',
-						// 	'what' => $number,
-						// 	'where' => $city));
-						// $dublgis = json_decode(file_get_contents($url.$uri));
 					}
 				}
 			} else {

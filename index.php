@@ -117,11 +117,13 @@ function get2GisCities()
 						$query .= " ('{$city->name}'),";
 					}
 					$query = substr($query, 0, -1);
+					pg_query($query);
 				}
 				header("Content-Type: text/plain"); var_dump($query); die();
 			} else {
 				return json_return(array('error' => 6, 'message' => 'Access deny.'));
 			}
+			pg_close($db);
 		}
 		return json_encode($json_return);
 	} else {

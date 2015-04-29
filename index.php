@@ -126,6 +126,10 @@ function getName($number) {
 						$dublgis = json_decode(file_get_contents($url.$uri));
 						$name = $dublgis->result[0]->name;
 						if ($name) {
+							$query = "update users set qty = qty - 1 where id = {$uid}";
+							pg_query($query);
+							$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
+							pg_query($query);
 							$json_return = array('error' => 0, 'name' => $name, 'translit' => rus2translit($name));
 						}
 					}

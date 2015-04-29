@@ -107,6 +107,7 @@ function get2GisCities()
 					'locale_filter' => 'ru_RU',
 					'country_code_filter' => 'ru',
 					'format' => 'json',
+					'page_size' => '150'
 					));
 				$dublgis = json_decode(file_get_contents($url.$uri));
 				header("Content-Type: text/plain"); var_dump($dublgis); die();

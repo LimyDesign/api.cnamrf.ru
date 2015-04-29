@@ -118,10 +118,10 @@ function get2GisCities()
 					}
 					$query = substr($query, 0, -1);
 					pg_query($query);
+					return json_encode(array('error' => 0, 'total' => $total));
 				}
-				header("Content-Type: text/plain"); var_dump($query); die();
 			} else {
-				return json_return(array('error' => 6, 'message' => 'Access deny.'));
+				return json_encode(array('error' => 6, 'message' => 'Access deny.'));
 			}
 			pg_close($db);
 		}

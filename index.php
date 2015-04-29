@@ -50,7 +50,7 @@ function getName($number) {
 	{
 		if ($conf['db']['type'] == 'postgres')
 		{
-			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database.');
+			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
 			$db = pg_connect('dbname=asd') or die(json_encode($db_err_message));
 			$query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid = tariff.id where apikey = '{$uAPIKey}'";
 			$result = pg_query($query);

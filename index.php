@@ -59,81 +59,15 @@ function getName($number) {
 			pg_free_result($result);
 			if ($uid) {
 				if ($qty) {
-					$query = "select name, translit from phonebook where phone = {$number} and verify = true";
+					$json_return = getData($number, $uid, $uClient, $uCIP, $conf);
+				} else {
+					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
 					$result = pg_query($query);
-					$name = pg_fetch_result($result, 0, 'name');
-					$translit = pg_fetch_result($result, 0, 'translit');
-					if ($name && $translit) {
-						$query = "update users set qty = qty - 1 where id = {$uid}";
-						pg_query($query);
-						$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
-						pg_query($query);
-						$json_return = array('error' => 0, 'name' => $name, 'translit' => $translit);
+					$balans = pg_fetch_result($result, 0, 'balans');
+					if ($balans >= $price) {
+						$json_return = getData($number, $uid, $uClient, $uCIP, $conf, $price);
 					} else {
-						header("Content-Type: text/plain");
-						$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
-						array_multisort($phones_masks, SORT_DESC);
-						foreach ($phones_masks as $masks) {
-							$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
-							preg_match($pattern, $masks['mask'], $mask);
-							if ($mask[3] == substr($number, 1, 5)) {
-								if ($masks['city']) {
-									if (count($masks['city']) == 1) {
-										$city = $masks['city'];
-										break;
-									} else {
-										$city = $masks['city'][0];
-										break;
-									}
-								} else {
-									$city = $masks['region'];
-									break 2;
-								}
-							} elseif ($mask[2] == substr($number, 1, 4)) {
-								if ($masks['city']) {
-									if (count($masks['city']) == 1) {
-										$city = $masks['city'];
-										break;
-									} else {
-										$city = $masks['city'][0];
-										break;
-									}
-								} else {
-									$city = $masks['region'];
-									break;
-								}
-							} elseif ($mask[1] == substr($number, 1, 3)) {
-								if ($masks['city']) {
-									if (count($masks['city']) == 1) {
-										$city = $masks['city'];
-										break;
-									} else {
-										$city = $masks['city'][0];
-										break;
-									}
-								} else {
-									$city = $masks['region'];
-									break 2;
-								}
-							}
-						}
-						$url = 'http://catalog.api.2gis.ru/search?';
-						$uri = http_build_query(array(
-							'key' => $conf['2gis']['key'],
-							'version' => '1.3',
-							'what' => $number,
-							'where' => $city));
-						$dublgis = json_decode(file_get_contents($url.$uri));
-						$name = $dublgis->result[0]->name;
-						if ($name) {
-							$query = "update users set qty = qty - 1 where id = {$uid}";
-							pg_query($query);
-							$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
-							pg_query($query);
-							$json_return = array('error' => 0, 'name' => $name, 'translit' => rus2translit($name));
-						} else {
-							$json_return = array('error' => 4, 'message' => 'The data in the directory is not found.');
-						}
+						$json_return = array('error' => 5, 'message' => 'Not enough funds. Go to http://cnamrf.ru, and refill your account in any convenient way.');
 					}
 				}
 			} else {
@@ -147,11 +81,102 @@ function getName($number) {
 	}
 }
 
-function defaultResult() {
+function defaultResult() 
+{
 	return json_encode(array('error' => 1, 'message' => 'Failed requests to the API interface.'));
 }
 
-function rus2translit($string) {
+function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
+{
+	$query = "select name, translit from phonebook where phone = {$number} and verify = true";
+	$result = pg_query($query);
+	$name = pg_fetch_result($result, 0, 'name');
+	$translit = pg_fetch_result($result, 0, 'translit');
+	if ($name && $translit) {
+		if ($price) {
+			$query = "insert into log (uid, phone, credit, client, ip) values ({$uid}, {$number}, '{$price}', '{$uClient}', {$uCIP})";
+			pg_query();
+		} else {
+			$query = "update users set qty = qty - 1 where id = {$uid}";
+			pg_query($query);
+			$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
+			pg_query($query);
+		}
+		return array('error' => 0, 'name' => $name, 'translit' => $translit);
+	} else {
+		$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
+		array_multisort($phones_masks, SORT_DESC);
+		foreach ($phones_masks as $masks) {
+			$pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
+			preg_match($pattern, $masks['mask'], $mask);
+			if ($mask[3] == substr($number, 1, 5)) {
+				if ($masks['city']) {
+					if (count($masks['city']) == 1) {
+						$city = $masks['city'];
+						break;
+					} else {
+						$city = $masks['city'][0];
+						break;
+					}
+				} else {
+					$city = $masks['region'];
+					break 2;
+				}
+			} elseif ($mask[2] == substr($number, 1, 4)) {
+				if ($masks['city']) {
+					if (count($masks['city']) == 1) {
+						$city = $masks['city'];
+						break;
+					} else {
+						$city = $masks['city'][0];
+						break;
+					}
+				} else {
+					$city = $masks['region'];
+					break;
+				}
+			} elseif ($mask[1] == substr($number, 1, 3)) {
+				if ($masks['city']) {
+					if (count($masks['city']) == 1) {
+						$city = $masks['city'];
+						break;
+					} else {
+						$city = $masks['city'][0];
+						break;
+					}
+				} else {
+					$city = $masks['region'];
+					break 2;
+				}
+			}
+		}
+		$url = 'http://catalog.api.2gis.ru/search?';
+		$uri = http_build_query(array(
+			'key' => $conf['2gis']['key'],
+			'version' => '1.3',
+			'what' => $number,
+			'where' => $city));
+		$dublgis = json_decode(file_get_contents($url.$uri));
+		$name = $dublgis->result[0]->name;
+		if ($name) {
+			if ($price) {
+				$query = "insert into log (uid, phone, credit, client, ip) values ({$uid}, {$number}, '{$price}', '{$uClient}', {$uCIP})";
+				pg_query();
+			} else {
+				$query = "update users set qty = qty - 1 where id = {$uid}";
+				pg_query($query);
+				$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
+				pg_query($query);
+			}
+			return array('error' => 0, 'name' => $name, 'translit' => rus2translit($name));
+		} else {
+			return array('error' => 4, 'message' => 'The data in the directory is not found.');
+		}
+	}
+}
+
+function rus2translit($string) 
+{
     $converter = array(
         'а' => 'a',   'б' => 'b',   'в' => 'v',
         'г' => 'g',   'д' => 'd',   'е' => 'e',

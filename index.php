@@ -95,7 +95,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 	if ($name && $translit) {
 		if ($price) {
 			$query = "insert into log (uid, phone, credit, client, ip) values ({$uid}, {$number}, {$price}, '{$uClient}', {$uCIP})";
-			pg_query();
+			pg_query($query);
 		} else {
 			$query = "update users set qty = qty - 1 where id = {$uid}";
 			pg_query($query);
@@ -161,10 +161,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 		if ($name) {
 			if ($price) {
 				$query = "insert into log (uid, phone, credit, client, ip) values ({$uid}, {$number}, {$price}, '{$uClient}', {$uCIP})";
-				header("Content-Type: text/plain");
-				var_dump($query);
-				die();
-				pg_query();
+				pg_query($query);
 			} else {
 				$query = "update users set qty = qty - 1 where id = {$uid}";
 				pg_query($query);

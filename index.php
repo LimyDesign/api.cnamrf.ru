@@ -131,6 +131,8 @@ function getName($number) {
 							$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
 							pg_query($query);
 							$json_return = array('error' => 0, 'name' => $name, 'translit' => rus2translit($name));
+						} else {
+							$json_return = array('error' => 4, 'message' => 'The data in the directory is not found.');
 						}
 					}
 				}

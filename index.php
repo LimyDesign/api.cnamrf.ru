@@ -29,11 +29,15 @@ switch ($cmd[0]) {
 		if ($_REQUEST['number']) $cmd[1] = $_REQUEST['number'];
 		echo getName($cmd[1]);
 		break;
+	case 'get2GisCities':
+		echo get2GisCities();
+		break;
 	default:
 		echo defaultResult();
 }
 
-function getName($number) {
+function getName($number) 
+{
 	global $conf;
 
 	$number = preg_replace('/[+()-\s]/', '', $number);
@@ -43,7 +47,7 @@ function getName($number) {
 		$number = '7' . $number;
 	}
 
-	$uAPIKey = $_REQUEST['apikey'];
+	$uAPIKey = preg_replace('/[^a-z0-9]/', '', $_REQUEST['apikey']);
 	$uClient = $_REQUEST['client'];
 	$uCIP = sprintf("%u", ip2long($_SERVER['REMOTE_ADDR']));
 
@@ -76,6 +80,35 @@ function getName($number) {
 				$json_return = array('error' => 3, 'message' => 'Not found any users for your API access key.');
 			}
 			pg_close($db);
+		}
+		return json_encode($json_return);
+	} else {
+		return json_encode(array('error' => 2, 'message' => 'Not found API access key or not specified client or not specified phone number.'));
+	}
+}
+
+function get2GisCities()
+{
+	global $conf;
+	$uAPIKey = $_REQUEST['apikey'];
+	if ($uAPIKey) {
+		if ($conf['db']['type'] == 'postgres')
+		{
+			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
+			$db = pg_connect('dbname='.$conf['db']['database']) or die(json_encode($db_err_message));
+			$query = "select is_admin from users where apikey = '{$uAPIKey}'";
+			$result = pg_query($query);
+			$is_admin = pg_fetch_result($result, 0, 'is_admin');
+			if ($is_admin == 't') {
+				$url = 'http://catalog.api.2gis.ru/2.0/region/list?';
+				$uri = http_build_query(array(
+					'key' => $conf['2gis']['key'],
+					));
+				$dublgis = json_decode(file_get_contents($url.$uri));
+				header("Content-Type: text/plain"); var_dump($dublgis); die();
+			} else {
+				return json_return(array('error' => 6, 'message' => 'Access deny.'));
+			}
 		}
 		return json_encode($json_return);
 	} else {

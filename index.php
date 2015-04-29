@@ -124,8 +124,7 @@ function getName($number) {
 							'what' => $number,
 							'where' => $city));
 						$dublgis = json_decode(file_get_contents($url.$uri));
-						var_dump($dublgis);
-						die();
+						$json_return = array('error' => 0, 'name' => $dublgis->result[0]->name, 'translit' => '');
 					}
 				}
 			} else {

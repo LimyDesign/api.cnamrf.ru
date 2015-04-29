@@ -26,6 +26,7 @@ header("Content-Type: application/json");
 
 switch ($cmd[0]) {
 	case 'getName':
+		if ($_REQUEST['number']) $cmd[1] = $_REQUEST['number'];
 		echo getName($cmd[1]);
 		break;
 	default:

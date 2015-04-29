@@ -90,7 +90,7 @@ function getName($number)
 function get2GisCities()
 {
 	global $conf;
-	$uAPIKey = $_REQUEST['apikey'];
+	$uAPIKey = preg_replace('/[^a-z0-9]/', '', $_REQUEST['apikey']);
 	if ($uAPIKey) {
 		if ($conf['db']['type'] == 'postgres')
 		{

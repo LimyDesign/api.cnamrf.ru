@@ -110,7 +110,15 @@ function get2GisCities()
 					'page_size' => '150'
 					));
 				$dublgis = json_decode(file_get_contents($url.$uri));
-				header("Content-Type: text/plain"); var_dump($dublgis); die();
+				$total = $dublgis->result->total;
+				if ($total) {
+					$query = "insert into cities (name) values";
+					foreach ($dublgis->result->items as $city) {
+						$query .= " ('{$city->name}'),";
+					}
+					$query = substr($query, -1);
+				}
+				header("Content-Type: text/plain"); var_dump($query); die();
 			} else {
 				return json_return(array('error' => 6, 'message' => 'Access deny.'));
 			}

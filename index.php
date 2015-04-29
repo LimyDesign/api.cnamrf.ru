@@ -116,7 +116,7 @@ function get2GisCities()
 					foreach ($dublgis->result->items as $city) {
 						$query .= " ('{$city->name}'),";
 					}
-					$query = substr($query, -1);
+					$query = substr($query, 0, -1);
 				}
 				header("Content-Type: text/plain"); var_dump($query); die();
 			} else {

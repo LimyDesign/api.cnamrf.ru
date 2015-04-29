@@ -94,7 +94,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 	$translit = pg_fetch_result($result, 0, 'translit');
 	if ($name && $translit) {
 		if ($price) {
-			$query = "insert into log (uid, phone, credit, client, ip) values ({$uid}, {$number}, '{$price}', '{$uClient}', {$uCIP})";
+			$query = "insert into log (uid, phone, credit, client, ip) values ({$uid}, {$number}, {$price}, '{$uClient}', {$uCIP})";
 			pg_query();
 		} else {
 			$query = "update users set qty = qty - 1 where id = {$uid}";
@@ -160,7 +160,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 		$name = $dublgis->result[0]->name;
 		if ($name) {
 			if ($price) {
-				$query = "insert into log (uid, phone, credit, client, ip) values ({$uid}, {$number}, '{$price}', '{$uClient}', {$uCIP})";
+				$query = "insert into log (uid, phone, credit, client, ip) values ({$uid}, {$number}, {$price}, '{$uClient}', {$uCIP})";
 				pg_query();
 			} else {
 				$query = "update users set qty = qty - 1 where id = {$uid}";

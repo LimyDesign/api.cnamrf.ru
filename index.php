@@ -117,10 +117,11 @@ function get2GisCities()
 						$query .= "'{$city->name}',";
 					}
 					$query = substr($query, 0, -1);
-					$query = "select insertCities(array[{$query}])";
-					die($query);
-					pg_query($query);
-					return json_encode(array('error' => 0, 'total' => $total));
+					$query = "select insertCities(array[{$query}]) returning insertCities";
+					$result = pg_query($query);
+					$totalInsert = pg_fetch_result($result, 0, 0);
+					pg_free_result($result);
+					return json_encode(array('error' => 0, 'total' => $total, 'total_insert' => $totalInsert));
 				}
 			} else {
 				return json_encode(array('error' => 6, 'message' => 'Access deny.'));

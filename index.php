@@ -157,31 +157,11 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 		}
 		return array('error' => '0', 'name' => $name, 'translit' => $translit);
 	} else {
-		$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
-		array_multisort($phones_masks, SORT_DESC);
-		foreach ($phones_masks as $masks) {
-			$mask = preg_replace('/[^0-9]/', '', $masks['mask']);
-			if ($mask == substr($number, 0, strlen($mask))) {
-				if ($masks['city']) {
-					if (count($masks['city']) == 1) {
-						$city = $masks['city'];
-						break;
-					} else {
-						$city = $masks['city'][0];
-						break;
-					}
-				}
-			}
-		}
-		$url = 'http://catalog.api.2gis.ru/search?';
-		$uri = http_build_query(array(
-			'key' => $conf['2gis']['key'],
-			'version' => '1.3',
-			'what' => $number,
-			'where' => $city));
-		$dublgis = json_decode(file_get_contents($url.$uri));
-		$name = $dublgis->result[0]->name;
-		if ($name) {
+		$query = "select name, translit from phone_cache where number = {$number} and queries >= 3 and modtime + interval '1 week' < now()";
+		$result = pg_query($query);
+		$name = pg_fetch_result($result, 0, 'name');
+		$translit = pg_fetch_result($result, 0, 'translit');
+		if ($name && $translit) {
 			if ($price) {
 				$query = "insert into log (uid, phone, credit, client, ip) values ({$uid}, {$number}, {$price}, '{$uClient}', {$uCIP})";
 				pg_query($query);
@@ -191,9 +171,65 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 				$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
 				pg_query($query);
 			}
-			return array('error' => '0', 'name' => $name, 'translit' => rus2translit($name));
+			return array('error' => '0', 'name' => $name, 'translit' => $translit);
 		} else {
-			return array('error' => '4', 'message' => 'The data in the directory is not found.');
+			$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
+			array_multisort($phones_masks, SORT_DESC);
+			foreach ($phones_masks as $masks) {
+				$mask = preg_replace('/[^0-9]/', '', $masks['mask']);
+				if ($mask == substr($number, 0, strlen($mask))) {
+					if ($masks['city']) {
+						if (count($masks['city']) == 1) {
+							$city = $masks['city'];
+							break;
+						} else {
+							$city = $masks['city'][0];
+							break;
+						}
+					}
+				}
+			}
+			$query = "select id from cities where name = '{$city}'";
+			$result = pg_query($query);
+			if (pg_fetch_result($result, 0, 0)) {
+				$query = "select number from phones_notexists where number = {$number}";
+				$result = pg_query($query);
+				if (!pg_fetch_result($result, 0, 0)) {
+					$url = 'http://catalog.api.2gis.ru/search?';
+					$uri = http_build_query(array(
+						'key' => $conf['2gis']['key'],
+						'version' => '1.3',
+						'what' => $number,
+						'where' => $city));
+					$dublgis = json_decode(file_get_contents($url.$uri));
+					$name = $dublgis->result[0]->name;
+					$translit = rus2translit($name);
+					if ($name) {
+						if ($price) {
+							$query = "insert into log (uid, phone, credit, client, ip) values ({$uid}, {$number}, {$price}, '{$uClient}', {$uCIP})";
+							pg_query($query);
+						} else {
+							$query = "update users set qty = qty - 1 where id = {$uid}";
+							pg_query($query);
+							$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
+							pg_query($query);
+						}
+						$query = "update phone_cache set modtime = now(), queries = queries + 1 where number = {$number};";
+						$query.= "insert into phone_cache (number, name, translit) select {$number}, '{$name}', '{$translit}' where not exists (select 1 from phone_cache where number = {$number});";
+						pg_query($query);
+						return array('error' => '0', 'name' => $name, 'translit' => $translit);
+					} else {
+						$query = "update phones_notexists set addtime = now() where number = {$number};";
+						$query.= "insert into phones_notexists (number) select {$number} where not exists (select 1 from phones_notexists where number = {$number});";
+						pg_query($query);
+						return array('error' => '4', 'message' => 'The phone number in the directory is not found and added to disabled list for a month.');
+					}
+				} else {
+					return array('error' => '8', 'message' => 'This is phone number is currently in disabled list because this phone number in the directory is not found. If you can prove ownership of the phone number, add it to your personal phone book.');
+				}
+			} else {
+				return array('error' => '7', 'message' => 'This city is not currently supported. If you can prove ownership of the number, add it to your personal phone book. But if you believe that in your town there 2GIS company, then email the customer support: support@cnamrf.ru.');
+			}
 		}
 	}
 }

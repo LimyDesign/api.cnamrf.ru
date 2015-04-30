@@ -157,8 +157,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 		}
 		return array('error' => '0', 'name' => $name, 'translit' => $translit);
 	} else {
-		$query = "select name, translit from phone_cache where number = {$number} and queries >= 3 and modtime + interval '1 week' < now()";
-		die($query);
+		$query = "select name, translit from phone_cache where number = {$number} and queries >= 3 and modtime + interval '1 week' > now()";
 		$result = pg_query($query);
 		$name = pg_fetch_result($result, 0, 'name');
 		$translit = pg_fetch_result($result, 0, 'translit');

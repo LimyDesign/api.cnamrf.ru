@@ -187,6 +187,8 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 							$city = $masks['city'][0];
 							break;
 						}
+					} else {
+						$city = $masks['region'];
 					}
 				}
 			}

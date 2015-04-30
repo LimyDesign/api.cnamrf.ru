@@ -117,6 +117,7 @@ function get2GisCities()
 						$query .= " ('{$city->name}'),";
 					}
 					$query = substr($query, 0, -1);
+					die($query);
 					pg_query($query);
 					return json_encode(array('error' => 0, 'total' => $total));
 				}
@@ -158,8 +159,6 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 		array_multisort($phones_masks, SORT_DESC);
 		foreach ($phones_masks as $masks) {
 			$mask = preg_replace('/[^0-9]/', '', $masks['mask']);
-			// $pattern = "/\((\d{3})\)|\((\d{4})\)|\((\d{5})\)/";
-			// preg_match($pattern, $masks['mask'], $mask);
 			if ($mask == substr($number, 0, strlen($mask))) {
 				if ($masks['city']) {
 					if (count($masks['city']) == 1) {
@@ -171,46 +170,6 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 					}
 				}
 			}
-			// if ($mask[3] == substr($number, 1, 5)) {
-			// 	if ($masks['city']) {
-			// 		if (count($masks['city']) == 1) {
-			// 			$city = $masks['city'];
-			// 			break;
-			// 		} else {
-			// 			$city = $masks['city'][0];
-			// 			break;
-			// 		}
-			// 	} else {
-			// 		$city = $masks['region'];
-			// 		break 2;
-			// 	}
-			// } elseif ($mask[2] == substr($number, 1, 4)) {
-			// 	if ($masks['city']) {
-			// 		if (count($masks['city']) == 1) {
-			// 			$city = $masks['city'];
-			// 			break;
-			// 		} else {
-			// 			$city = $masks['city'][0];
-			// 			break;
-			// 		}
-			// 	} else {
-			// 		$city = $masks['region'];
-			// 		break;
-			// 	}
-			// } elseif ($mask[1] == substr($number, 1, 3)) {
-			// 	if ($masks['city']) {
-			// 		if (count($masks['city']) == 1) {
-			// 			$city = $masks['city'];
-			// 			break;
-			// 		} else {
-			// 			$city = $masks['city'][0];
-			// 			break;
-			// 		}
-			// 	} else {
-			// 		$city = $masks['region'];
-			// 		break 2;
-			// 	}
-			// }
 		}
 		$url = 'http://catalog.api.2gis.ru/search?';
 		$uri = http_build_query(array(

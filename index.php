@@ -228,7 +228,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 					return array('error' => '8', 'message' => 'This is phone number is currently in disabled list because this phone number in the directory is not found. If you can prove ownership of the phone number, add it to your personal phone book.');
 				}
 			} else {
-				return array('error' => '7', 'message' => 'This city is not currently supported. If you can prove ownership of the number, add it to your personal phone book. But if you believe that in your town there 2GIS company, then email the customer support: support@cnamrf.ru.', 'city' => {$city});
+				return array('error' => '7', 'message' => 'This city is not currently supported. If you can prove ownership of the number, add it to your personal phone book. But if you believe that in your town there 2GIS company, then email the customer support: support@cnamrf.ru.', 'city' => $city);
 			}
 		}
 	}

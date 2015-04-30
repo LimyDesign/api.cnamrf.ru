@@ -175,6 +175,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 		} else {
 			$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
 			array_multisort($phones_masks, SORT_DESC);
+			$city = '';
 			foreach ($phones_masks as $masks) {
 				$mask = preg_replace('/[^0-9]/', '', $masks['mask']);
 				if ($mask == substr($number, 0, strlen($mask))) {

@@ -121,7 +121,7 @@ function get2GisCities()
 					$result = pg_query($query);
 					$totalInsert = pg_fetch_result($result, 0, 0);
 					pg_free_result($result);
-					return json_encode(array('error' => '0', 'total' => '{$total}', 'total_insert' => $totalInsert));
+					return json_encode(array('error' => '0', 'total' => "{$total}", 'total_insert' => $totalInsert));
 				}
 			} else {
 				return json_encode(array('error' => '6', 'message' => 'Access deny.'));

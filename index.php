@@ -171,7 +171,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 				$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
 				pg_query($query);
 			}
-			return array('error' => '0', 'name' => $name, 'translit' => $translit);
+			return array('error' => '0', 'name' => $name, 'translit' => $translit, 'ok' => 'yeah!');
 		} else {
 			$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
 			array_multisort($phones_masks, SORT_DESC);

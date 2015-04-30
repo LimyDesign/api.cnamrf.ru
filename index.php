@@ -112,11 +112,12 @@ function get2GisCities()
 				$dublgis = json_decode(file_get_contents($url.$uri));
 				$total = $dublgis->result->total;
 				if ($total) {
-					$query = "insert into cities (name) values";
+					$query = '';
 					foreach ($dublgis->result->items as $city) {
-						$query .= " ('{$city->name}'),";
+						$query .= "'{$city->name}',";
 					}
 					$query = substr($query, 0, -1);
+					$query2 = "select insertCities({$query})";
 					die($query);
 					pg_query($query);
 					return json_encode(array('error' => 0, 'total' => $total));

@@ -118,6 +118,7 @@ function get2GisCities()
 					}
 					$query = substr($query, 0, -1);
 					$query = "select insertCities(array[{$query}]) returning insertCities";
+					die($query);
 					$result = pg_query($query);
 					$totalInsert = pg_fetch_result($result, 0, 0);
 					pg_free_result($result);

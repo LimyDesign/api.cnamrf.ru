@@ -171,7 +171,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 				$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
 				pg_query($query);
 			}
-			return array('error' => '0', 'name' => $name, 'translit' => $translit, 'ok' => 'yeah!');
+			return array('error' => '0', 'name' => $name, 'translit' => $translit, 'from' => 'cnamrf');
 		} else {
 			$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
 			array_multisort($phones_masks, SORT_DESC);
@@ -217,7 +217,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 						$query = "update phone_cache set modtime = now(), queries = queries + 1 where number = {$number};";
 						$query.= "insert into phone_cache (number, name, translit) select {$number}, '{$name}', '{$translit}' where not exists (select 1 from phone_cache where number = {$number});";
 						pg_query($query);
-						return array('error' => '0', 'name' => $name, 'translit' => $translit);
+						return array('error' => '0', 'name' => $name, 'translit' => $translit, 'from' => '2gis');
 					} else {
 						$query = "update phones_notexists set addtime = now() where number = {$number};";
 						$query.= "insert into phones_notexists (number) select {$number} where not exists (select 1 from phones_notexists where number = {$number});";

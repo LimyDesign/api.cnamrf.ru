@@ -55,7 +55,7 @@ function getName($number)
 	{
 		if ($conf['db']['type'] == 'postgres')
 		{
-			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
+			$db_err_message = array('error' => '100', 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
 			$db = pg_connect('dbname='.$conf['db']['database']) or die(json_encode($db_err_message));
 			$query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid = tariff.id where apikey = '{$uAPIKey}'";
 			$result = pg_query($query);
@@ -73,17 +73,17 @@ function getName($number)
 					if ($balans >= $price) {
 						$json_return = getData($number, $uid, $uClient, $uCIP, $conf, $price);
 					} else {
-						$json_return = array('error' => 5, 'message' => 'Not enough funds. Go to http://cnamrf.ru, and refill your account in any convenient way.');
+						$json_return = array('error' => '5', 'message' => 'Not enough funds. Go to http://cnamrf.ru, and refill your account in any convenient way.');
 					}
 				}
 			} else {
-				$json_return = array('error' => 3, 'message' => 'Not found any users for your API access key.');
+				$json_return = array('error' => '3', 'message' => 'Not found any users for your API access key.');
 			}
 			pg_close($db);
 		}
 		return json_encode($json_return);
 	} else {
-		return json_encode(array('error' => 2, 'message' => 'Not found API access key or not specified client or not specified phone number.'));
+		return json_encode(array('error' => '2', 'message' => 'Not found API access key or not specified client or not specified phone number.'));
 	}
 }
 
@@ -121,22 +121,22 @@ function get2GisCities()
 					$result = pg_query($query);
 					$totalInsert = pg_fetch_result($result, 0, 0);
 					pg_free_result($result);
-					return json_encode(array('error' => 0, 'total' => $total, 'total_insert' => $totalInsert));
+					return json_encode(array('error' => '0', 'total' => '{$total}', 'total_insert' => $totalInsert));
 				}
 			} else {
-				return json_encode(array('error' => 6, 'message' => 'Access deny.'));
+				return json_encode(array('error' => '6', 'message' => 'Access deny.'));
 			}
 			pg_close($db);
 		}
 		return json_encode($json_return);
 	} else {
-		return json_encode(array('error' => 2, 'message' => 'Not found API access key or not specified client or not specified phone number.'));
+		return json_encode(array('error' => '2', 'message' => 'Not found API access key or not specified client or not specified phone number.'));
 	}
 }
 
 function defaultResult() 
 {
-	return json_encode(array('error' => 1, 'message' => 'Failed requests to the API interface.'));
+	return json_encode(array('error' => '1', 'message' => 'Failed requests to the API interface.'));
 }
 
 function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
@@ -155,7 +155,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 			$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
 			pg_query($query);
 		}
-		return array('error' => 0, 'name' => $name, 'translit' => $translit);
+		return array('error' => '0', 'name' => $name, 'translit' => $translit);
 	} else {
 		$phones_masks = json_decode(file_get_contents(__DIR__.'/../www/js/phones-ru.json'), true);
 		array_multisort($phones_masks, SORT_DESC);
@@ -191,9 +191,9 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 				$query = "insert into log (uid, phone, client, ip) values ({$uid}, {$number}, '{$uClient}', {$uCIP})";
 				pg_query($query);
 			}
-			return array('error' => 0, 'name' => $name, 'translit' => rus2translit($name));
+			return array('error' => '0', 'name' => $name, 'translit' => rus2translit($name));
 		} else {
-			return array('error' => 4, 'message' => 'The data in the directory is not found.');
+			return array('error' => '4', 'message' => 'The data in the directory is not found.');
 		}
 	}
 }

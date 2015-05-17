@@ -35,11 +35,16 @@ switch ($cmd[0]) {
 		break;
 
 	case 'getCompanyList':
+		if (is_numeric($cmd[1])) {
+			$pageNum = $cmd[1];
+			$pageNum = $pageNum ? $pageNum : 1;
+		}
 		echo getCompanyList(
 			$_REQUEST['apikey'], 
 			$_REQUEST['text'], 
 			$_REQUEST['city'],
-			$_REQUEST['domain']);
+			$_REQUEST['domain'],
+			$pageNum);
 		break;
 
 	default:
@@ -178,7 +183,7 @@ function get2GisCities()
  * @param  string  $domain Доменное имя с которого производиться запрос
  * @return string          Данные в формате JSON
  */
-function getCompanyList($apikey, $text, $city, $domain) 
+function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1) 
 {
 	global $conf;
 
@@ -205,12 +210,16 @@ function getCompanyList($apikey, $text, $city, $domain)
 				if ($qty) {
 					$query = "update users set qty = qty - 1 where id = {$uid}";
 					pg_query($query);
+					$text = pg_escape_string($text);
+					$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '$text')";
+					pg_query($query);
 					$url = 'http://catalog.api.2gis.ru/search?';
 					$uri = http_build_query(array(
 						'key' => $conf['2gis']['key'],
 						'version' => '1.3',
 						'what' => $text,
 						'where' => $cityName,
+						'page' => $pageNum,
 						'pagesize' => 50));
 					$dublgis = json_decode(file_get_contents($url.$uri));
 					$result = array();
@@ -225,14 +234,38 @@ function getCompanyList($apikey, $text, $city, $domain)
 						'error' => '0', 
 						'total' => $dublgis->total,
 						'pagesize' => '50',
+						'page' => $pageNum,
 						'result' => $result);
-					var_dump(json_decode(json_encode($json_return))); die();
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
 					$result = pg_query($query);
 					$balans = pg_fetch_result($result, 0, 'balans');
 					if ($balans >= $price) {
-						$json_return = getDataList($text, $cityName, $uid, $uClient, $uCIP, $conf, $price);
+						$query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '$text')";
+						pg_query($query);
+						$url = 'http://catalog.api.2gis.ru/search?';
+						$uri = http_build_query(array(
+							'key' => $conf['2gis']['key'],
+							'version' => '1.3',
+							'what' => $text,
+							'where' => $cityName,
+							'page' => $pageNum,
+							'pagesize' => 50));
+						$dublgis = json_decode(file_get_contents($url.$uri));
+						$result = array();
+						foreach ($dublgis->result as $key => $value) {
+							$result[$key]['id'] = $value->id;
+							$result[$key]['name'] = $value->name;
+							$result[$key]['hash'] = $value->hash;
+							$result[$key]['firm_group'] = $value->firm_group->count;
+							$result[$key]['address'] = $value->address;
+						}
+						$json_return = array(
+							'error' => '0', 
+							'total' => $dublgis->total,
+							'pagesize' => '50',
+							'page' => $pageNum,
+							'result' => $result);
 					} else {
 						$json_return = array('error' => '5', 'message' => 'Not enough funds. Go to http://www.lead4crm.ru, and refill your account in any convenient way.');
 					}

@@ -193,7 +193,6 @@ function getCompanyList($apikey, $text, $city, $domain)
 			$db = pg_connect('dbname='.$conf['db']['database']) or 
 				die(json_encode($db_err_message));
 			$query = "select name from cities where id = {$city}";
-			die($query);
 			$result = pg_query($query);
 			$cityName = pg_fetch_result($result, 0, 'name');
 			$query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";

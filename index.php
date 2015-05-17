@@ -225,7 +225,7 @@ function getCompanyList($apikey, $text, $city, $domain)
 						'total' => $dublgis->total,
 						'pagesize' => '50',
 						'result' => $result);
-					print_r($json_return); die();
+					var_dump($json_return); die();
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
 					$result = pg_query($query);

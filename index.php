@@ -171,26 +171,6 @@ function get2GisCities()
  *
  * В случае неудачи возвращает JSON-строку с кодом ошибки (error)
  * и сообщением самой ошибки (message).
- *
- * Ошибки бывают слудующие:
- * |============|==========================================|======================================|
- * | Код ошибки | Сообщение                                | Пояснение                            |
- * | (error)    | (message)                                |                                      |
- * |============|==========================================|======================================|
- * | 2          | Not found API access key or              | Не найден ключ доступа или поисковый |
- * |            | not search text or not city number.      | текст или идентификатор города.      |
- * |------------|------------------------------------------|--------------------------------------|
- * | 3          | Not found any users for your API         | Не найден пользователь по указанному |
- * |            | access key.                              | ключу доступа.                       |
- * |------------|------------------------------------------|--------------------------------------|
- * | 4          | The phone number in the directory        | Запрашиваемый номер не найден ни в   |
- * |            | is not found and added to disabled       | одно справочнике, поэтому добавлен   |
- * |            | list for a month.                        | в список блокировок на 1 месяц.      |
- * |------------|------------------------------------------|--------------------------------------|
- * | 5          | Not enough funds. Go to                  | Не достаточно средств. Перейдите на  |
- * |            | http://www.lead4crm.ru, and refill       | http://www.lead4crm.ru и пополните   |
- * |            | your account in any convenient way.      | баланс любым удобным способом.       |
- * |------------|------------------------------------------|--------------------------------------|
  * 
  * @param  string  $apikey Ключ доступа пользователя
  * @param  string  $text   Поисковая строка
@@ -209,12 +189,13 @@ function getCompanyList($apikey, $text, $city, $domain)
 	if ($apikey && $text && is_numeric($city)) {
 		if ($conf['db']['type'] == 'postgres')
 		{
-			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
+			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@lead4crm.ru about this error.');
 			$db = pg_connect('dbname='.$conf['db']['database']) or 
 				die(json_encode($db_err_message));
 			$query = 'select name from cities where id = {$city}';
 			$result = pg_query($query);
 			$cityName = pg_fetch_result($result, 0, 'name');
+			die($cityName);
 			$query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";
 			$result = pg_query($query);
 			$uid = pg_fetch_result($result, 0, 'id');

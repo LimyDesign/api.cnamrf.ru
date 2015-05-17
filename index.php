@@ -235,6 +235,7 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 						'total' => $dublgis->total,
 						'pagesize' => '50',
 						'page' => $pageNum,
+						'qty' => $qty - 1,
 						'result' => $result);
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";

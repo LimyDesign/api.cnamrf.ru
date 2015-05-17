@@ -29,13 +29,34 @@ switch ($cmd[0]) {
 		if ($_REQUEST['number']) $cmd[1] = $_REQUEST['number'];
 		echo getName($cmd[1]);
 		break;
+	
 	case 'get2GisCities':
 		echo get2GisCities();
 		break;
+
+	case 'getCompanyList':
+		echo getCompanyList(
+			$_REQUEST['apikey'], 
+			$_REQUEST['text'], 
+			$_REQUEST['city'],
+			$_REQUEST['domain']);
+		break;
+
 	default:
 		echo defaultResult();
 }
 
+/**
+ * Функция возвращает данные по номеру телефона $number.
+ * В случае удачи возращает JSON-строку в которой содержиться имя по-русски (name),
+ * и имя в транслите (tarslit), а также нулевой код ошибки (error).
+ *
+ * В случае неудачи возвращается JSON-строка с кодом ошибки (error) и 
+ * текстом ошибки (message).
+ * 
+ * @param  integer $number Номер телефона в формате E.164
+ * @return string          Данные в формате JSON
+ */
 function getName($number) 
 {
 	global $conf;
@@ -87,6 +108,12 @@ function getName($number)
 	}
 }
 
+/**
+ * Функция получает список городов в которых присутствует
+ * компания 2ГИС и возвращает список в формате JSON.
+ * 
+ * @return string Список городов в формате JSON
+ */
 function get2GisCities()
 {
 	global $conf;
@@ -134,11 +161,124 @@ function get2GisCities()
 	}
 }
 
+/**
+ * Функция получает список компаний по поисковой строке $text
+ * в указанном городе $city для пользователя $apikey с
+ * запросом от указанного доменного имени $domain.
+ * Функция возкращает данные в формате JSON.
+ *
+ * В случае успеха возвращает JSON-строку с нулевым кодом ошибки (error).
+ *
+ * В случае неудачи возвращает JSON-строку с кодом ошибки (error)
+ * и сообщением самой ошибки (message).
+ *
+ * Ошибки бывают слудующие:
+ * |============|==========================================|======================================|
+ * | Код ошибки | Сообщение                                | Пояснение                            |
+ * | (error)    | (message)                                |                                      |
+ * |============|==========================================|======================================|
+ * | 2          | Not found API access key or              | Не найден ключ доступа или поисковый |
+ * |            | not search text or not city number.      | текст или идентификатор города.      |
+ * |------------|------------------------------------------|--------------------------------------|
+ * | 3          | Not found any users for your API         | Не найден пользователь по указанному |
+ * |            | access key.                              | ключу доступа.                       |
+ * |------------|------------------------------------------|--------------------------------------|
+ * | 4          | The phone number in the directory        | Запрашиваемый номер не найден ни в   |
+ * |            | is not found and added to disabled       | одно справочнике, поэтому добавлен   |
+ * |            | list for a month.                        | в список блокировок на 1 месяц.      |
+ * |------------|------------------------------------------|--------------------------------------|
+ * | 5          | Not enough funds. Go to                  | Не достаточно средств. Перейдите на  |
+ * |            | http://www.lead4crm.ru, and refill       | http://www.lead4crm.ru и пополните   |
+ * |            | your account in any convenient way.      | баланс любым удобным способом.       |
+ * |------------|------------------------------------------|--------------------------------------|
+ * 
+ * @param  string  $apikey Ключ доступа пользователя
+ * @param  string  $text   Поисковая строка
+ * @param  integer $city   Код города из списка поддерживаемых городов
+ * @param  string  $domain Доменное имя с которого производиться запрос
+ * @return string          Данные в формате JSON
+ */
+function getCompanyList($apikey, $text, $city, $domain) 
+{
+	global $conf;
+
+	$apikey = preg_replace('/[^a-z0-9]/', '', $_REQUEST['apikey']);
+	$uClient = 'Lead4CRM';
+	$uCIP = sprintf("%u", ip2long(gethostbyname($domain)));
+	
+	if ($apikey && $text && is_numeric($city)) {
+		if ($conf['db']['type'] == 'postgres')
+		{
+			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
+			$db = pg_connect('dbname='.$conf['db']['database']) or 
+				die(json_encode($db_err_message));
+			$query = 'select name from cities where id = {$city}';
+			$result = pg_query($query);
+			$cityName = pg_fetch_result($result, 0, 'name');
+			$query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";
+			$result = pg_query($query);
+			$uid = pg_fetch_result($result, 0, 'id');
+			$qty = pg_fetch_result($result, 0, 'qty');
+			$price = pg_fetch_result($result, 0, 'price');
+			pg_free_result($result);
+			if ($uid) {
+				if ($qty) {
+					$query = "update users set qty = qty - 1 where id = {$uid}";
+					pg_query($query);
+					$url = 'http://catalog.api.2gis.ru/search?';
+					$uri = http_build_query(array(
+						'key' => $conf['2gis']['key'],
+						'version' => '1.3',
+						'what' => $text,
+						'where' => $cityName));
+					$dublgis = json_decode(file_get_contents($url.$uri));
+					print_r($dublgis); die();
+				} else {
+					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
+					$result = pg_query($query);
+					$balans = pg_fetch_result($result, 0, 'balans');
+					if ($balans >= $price) {
+						$json_return = getDataList($text, $cityName, $uid, $uClient, $uCIP, $conf, $price);
+					} else {
+						$json_return = array('error' => '5', 'message' => 'Not enough funds. Go to http://www.lead4crm.ru, and refill your account in any convenient way.');
+					}
+				}
+			} else {
+				$json_return = array('error' => '3', 'message' => 'Not found any users for your API access key.');
+			}
+			pg_close($db);
+		}
+		return json_encode($json_return);
+	} else {
+		return json_encode(array('error' => '2', 'message' => 'Not found API access key or not search text or not city number.'));
+	}
+}
+
+/**
+ * Функция возвращает сообщение заглушку, в случае
+ * пустого запроса к данному API.
+ * 
+ * @return string Данные в формате JSON
+ */
 function defaultResult() 
 {
 	return json_encode(array('error' => '1', 'message' => 'Failed requests to the API interface.'));
 }
 
+/**
+ * Функция получения данные либо из локальной базы данных,
+ * либо из справочника 2ГИС. Это вспомогательная функция,
+ * для получения и передачи данных пользователю используеются
+ * другие функции, например getName($number).
+ * 
+ * @param  integer  $number  Номер телефона в стандарте E.164
+ * @param  integer  $uid     Уникальный идентификатор пользователя
+ * @param  string   $uClient Название клиента, получающий данные
+ * @param  integer  $uCIP    IPv4 в формате допустимого адреса
+ * @param  array    $conf    Данные конфигурационного файла
+ * @param  integer  $price   Стоимость каждого запроса пользователя
+ * @return array             Массив данных
+ */
 function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 {
 	$query = "select name, translit from phonebook where phone = {$number} and verify = true";
@@ -195,7 +335,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 			$query = "select id from cities where name = '{$city}'";
 			$result = pg_query($query);
 			if (pg_fetch_result($result, 0, 0)) {
-				$query = "select number from phones_notexists where number = {$number}";
+				$query = "select number from phones_notexists where number = {$number} and addtime + interval '1 month' > now()";
 				$result = pg_query($query);
 				if (!pg_fetch_result($result, 0, 0)) {
 					$url = 'http://catalog.api.2gis.ru/search?';
@@ -237,6 +377,12 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 	}
 }
 
+/**
+ * Функция конфертирует кирилицу в транслит.
+ * 
+ * @param  string $string Входная строка, которая будет преобразована
+ * @return string         Результат транслитерации строки
+ */
 function rus2translit($string) 
 {
     $converter = array(

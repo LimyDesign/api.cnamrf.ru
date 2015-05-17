@@ -192,7 +192,7 @@ function getCompanyList($apikey, $text, $city, $domain)
 			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@lead4crm.ru about this error.');
 			$db = pg_connect('dbname='.$conf['db']['database']) or 
 				die(json_encode($db_err_message));
-			$query = 'select name from cities where id = {$city}';
+			$query = "select name from cities where id = {$city}";
 			die($query);
 			$result = pg_query($query);
 			$cityName = pg_fetch_result($result, 0, 'name');

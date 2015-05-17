@@ -214,16 +214,18 @@ function getCompanyList($apikey, $text, $city, $domain)
 						'pagesize' => 50));
 					$dublgis = json_decode(file_get_contents($url.$uri));
 					foreach ($dublgis->result as $key => $value) {
-						var_dump($key);
-						var_dump($value);
+						$result[$key]['id'] = $value->id;
+						$result[$key]['name'] = $value->name;
+						$result[$key]['hash'] = $value->hash;
+						$result[$key]['firm_group'] = $value->firm_group->count;
+						$result[$key]['address'] = $value->address;
 					}
-					die();
 					$json_return = array(
 						'error' => '0', 
 						'total' => $dublgis->total,
 						'pagesize' => '50',
 						'result' => $result);
-					print_r($dublgis); die();
+					print_r($json_return); die();
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
 					$result = pg_query($query);

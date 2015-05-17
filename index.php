@@ -36,8 +36,7 @@ switch ($cmd[0]) {
 
 	case 'getCompanyList':
 		if (is_numeric($cmd[1])) {
-			$pageNum = $cmd[1];
-			$pageNum = $pageNum ? $pageNum : 1;
+			$pageNum = $cmd[1] ? $cmd[1] : 1;
 		}
 		echo getCompanyList(
 			$_REQUEST['apikey'], 

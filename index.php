@@ -213,7 +213,7 @@ function getCompanyList($apikey, $text, $city, $domain)
 						'where' => $cityName,
 						'pagesize' => 50));
 					$dublgis = json_decode(file_get_contents($url.$uri));
-					foreach ($dublgis-> as $key => $value) {
+					foreach ($dublgis->result as $key => $value) {
 						var_dump($key);
 						var_dump($value);
 					}

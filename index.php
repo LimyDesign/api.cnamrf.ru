@@ -176,11 +176,12 @@ function get2GisCities()
  * В случае неудачи возвращает JSON-строку с кодом ошибки (error)
  * и сообщением самой ошибки (message).
  * 
- * @param  string  $apikey Ключ доступа пользователя
- * @param  string  $text   Поисковая строка
- * @param  integer $city   Код города из списка поддерживаемых городов
- * @param  string  $domain Доменное имя с которого производиться запрос
- * @return string          Данные в формате JSON
+ * @param  string  $apikey  Ключ доступа пользователя
+ * @param  string  $text    Поисковая строка
+ * @param  integer $city    Код города из списка поддерживаемых городов
+ * @param  string  $domain  Доменное имя с которого производиться запрос
+ * @param  integer $pageNum Номер страницы запрашиваемой в справочнике 2ГИС
+ * @return string           Данные в формате JSON
  */
 function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1) 
 {

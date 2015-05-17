@@ -213,15 +213,16 @@ function getCompanyList($apikey, $text, $city, $domain)
 						'where' => $cityName,
 						'pagesize' => 50));
 					$dublgis = json_decode(file_get_contents($url.$uri));
+					$result = array();
 					foreach ($dublgis->result as $key => $value) {
 						$result[$key]['id'] = $value->id;
 						$result[$key]['name'] = $value->name;
 						$result[$key]['hash'] = $value->hash;
 						$result[$key]['firm_group'] = $value->firm_group->count;
 						$result[$key]['address'] = $value->address;
-						var_dump($value->id, $value->name, $value->hash, $value->firm_group->count, $value->address);
+						// var_dump($value->id, $value->name, $value->hash, $value->firm_group->count, $value->address);
 					}
-					die();
+					var_dump($result); die();
 					$json_return = array(
 						'error' => '0', 
 						'total' => $dublgis->total,

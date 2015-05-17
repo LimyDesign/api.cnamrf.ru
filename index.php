@@ -220,9 +220,7 @@ function getCompanyList($apikey, $text, $city, $domain)
 						$result[$key]['hash'] = $value->hash;
 						$result[$key]['firm_group'] = $value->firm_group->count;
 						$result[$key]['address'] = $value->address;
-						// var_dump($value->id, $value->name, $value->hash, $value->firm_group->count, $value->address);
 					}
-					var_dump($result); die();
 					$json_return = array(
 						'error' => '0', 
 						'total' => $dublgis->total,

@@ -210,7 +210,8 @@ function getCompanyList($apikey, $text, $city, $domain)
 						'key' => $conf['2gis']['key'],
 						'version' => '1.3',
 						'what' => $text,
-						'where' => $cityName));
+						'where' => $cityName,
+						'pagesize' => 50));
 					$dublgis = json_decode(file_get_contents($url.$uri));
 					print_r($dublgis); die();
 				} else {

@@ -46,6 +46,14 @@ switch ($cmd[0]) {
 			$pageNum);
 		break;
 
+	case 'getCompanyProfile':
+		echo getCompanyProfile(
+			$_REQUEST['apikey'],
+			$_REQUEST['domain'],
+			$_REQUEST['id'],
+			$_REQUEST['hash']);
+		break;
+
 	default:
 		echo defaultResult();
 }
@@ -237,6 +245,108 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 						'page' => $pageNum,
 						'qty' => $qty - 1,
 						'result' => $result);
+				} else {
+					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
+					$result = pg_query($query);
+					$balans = pg_fetch_result($result, 0, 'balans');
+					if ($balans >= $price) {
+						$query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '$text')";
+						pg_query($query);
+						$url = 'http://catalog.api.2gis.ru/search?';
+						$uri = http_build_query(array(
+							'key' => $conf['2gis']['key'],
+							'version' => '1.3',
+							'what' => $text,
+							'where' => $cityName,
+							'page' => $pageNum,
+							'pagesize' => 50));
+						$dublgis = json_decode(file_get_contents($url.$uri));
+						$result = array();
+						foreach ($dublgis->result as $key => $value) {
+							$result[$key]['id'] = $value->id;
+							$result[$key]['name'] = $value->name;
+							$result[$key]['hash'] = $value->hash;
+							$result[$key]['firm_group'] = $value->firm_group->count;
+							$result[$key]['address'] = $value->address;
+						}
+						$json_return = array(
+							'error' => '0', 
+							'total' => $dublgis->total,
+							'pagesize' => '50',
+							'page' => $pageNum,
+							'result' => $result);
+					} else {
+						$json_return = array('error' => '5', 'message' => 'Not enough funds. Go to http://www.lead4crm.ru, and refill your account in any convenient way.');
+					}
+				}
+			} else {
+				$json_return = array('error' => '3', 'message' => 'Not found any users for your API access key.');
+			}
+			pg_close($db);
+		}
+		return json_encode($json_return);
+	} else {
+		return json_encode(array('error' => '2', 'message' => 'Not found API access key or not search text or not city number.'));
+	}
+}
+
+/**
+ * Функция возвращает JSON-строку содержащую полную,
+ * развернутую информацию о компании для инморта 
+ * в справочник CRM системы
+ * 
+ * @param  string $api    Ключ доступа выдаваемый пользователю при регистрации
+ * @param  string $domain Домен с которого происходит обращение
+ * @param  string $id     Уникальный идентификатор филиала 2ГИС
+ * @param  string $hash   Уникальный хэш филиала выдаваемый 2ГИС
+ * @return string         Массив данных в JSON-формате
+ */
+function getCompanyProfile($api, $domain, $id, $hash) 
+{
+	global $conf;
+
+	$apikey = preg_replace('/[^a-z0-9]/', '', $_REQUEST['apikey']);
+	$uClient = 'Lead4CRM';
+	$uCIP = sprintf("%u", ip2long(gethostbyname($domain)));
+	
+	if ($apikey && $hash && is_numeric($id)) {
+		if ($conf['db']['type'] == 'postgres')
+		{
+			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@lead4crm.ru about this error.');
+			$db = pg_connect('dbname='.$conf['db']['database']) or 
+				die(json_encode($db_err_message));
+			$query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";
+			$result = pg_query($query);
+			$uid = pg_fetch_result($result, 0, 'id');
+			$qty = pg_fetch_result($result, 0, 'qty');
+			$price = pg_fetch_result($result, 0, 'price');
+			pg_free_result($result);
+			if ($uid) {
+				if ($qty) {
+					$query = "update users set qty = qty - 1 where id = {$uid}";
+					pg_query($query);
+					$url = 'http://catalog.api.2gis.ru/profile?';
+					$uri = http_build_query(array(
+						'key' => $conf['2gis']['key'],
+						'version' => '1.3',
+						'id' => $id,
+						'hash' => $hash));
+					$dublgis = json_decode(file_get_contents($url.$uri));
+					$companyName = pg_escape_string($dublgis->name);
+					$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}')";
+					pg_query($query);
+					var_dump($dublgis); die();
+					$json_return = array(
+						'error' => '0',
+						'id' => $dublgis->id,
+						'log' => $dublgis->lon,
+						'lat' => $dublgis->lat,
+						'name' => $dublgis->name,
+						'city_name' => $dublgis->city_name,
+						'address' => $dublgis->address,
+						'currency' => $dublgis->additional_info->currency,
+						'address_2' => $dublgis->additional_info->office,
+						'phone' => $dublgis->contacts->contacts);
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
 					$result = pg_query($query);

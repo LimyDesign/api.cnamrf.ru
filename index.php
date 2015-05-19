@@ -335,7 +335,6 @@ function getCompanyProfile($api, $domain, $id, $hash)
 					$companyName = pg_escape_string($dublgis->name);
 					$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}')";
 					pg_query($query);
-					var_dump($dublgis); die();
 					$json_return = array(
 						'error' => '0',
 						'id' => $dublgis->id,
@@ -345,8 +344,11 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						'city_name' => $dublgis->city_name,
 						'address' => $dublgis->address,
 						'currency' => $dublgis->additional_info->currency,
-						'address_2' => $dublgis->additional_info->office,
-						'phone' => $dublgis->contacts->contacts);
+						'address_2' => $dublgis->additional_info->office);
+					foreach ($dublgis->contacts[0]->contacts as $contact) {
+						var_dump($contact);
+					}
+					die();
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
 					$result = pg_query($query);

@@ -190,11 +190,12 @@ function get2GisRubrics($city_id)
 			$result = pg_query($query);
 			$is_admin = pg_fetch_result($result, 0, 'is_admin');
 			if ($is_admin == 't' && is_numeric($city_id)) {
+				ob_implicit_flush(true);
 				$query = "select name from cities where id = {$city_id}";
 				$result = pg_query($query);
 				$city_name = pg_fetch_result($result, 0, 'name');
 				echo 'Получение рубрик для г. '.$cityName.'...'."\n";
-				ob_flush();
+				flush();
 				$url = 'http://catalog.api.2gis.ru/rubricator?';
 				$uri = http_build_query(array(
 					'key' => $conf['2gis']['key'],
@@ -219,7 +220,7 @@ function get2GisRubrics($city_id)
 					pg_query($query);
 				}
 				echo 'Импорт рубрик для г. '.$cityName.' закончен.'."\n";
-				ob_flush();
+				flush();
 			} else {
 				return json_encode(array('error' => '6', 'message' => 'Access deny.'));
 			}

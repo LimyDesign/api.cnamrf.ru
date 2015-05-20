@@ -221,6 +221,7 @@ function get2GisRubrics($city_id)
 				}
 				echo 'Импорт рубрик для г. '.$cityName.' закончен.'."\n";
 				flush();
+				die();
 			} else {
 				return json_encode(array('error' => '6', 'message' => 'Access deny.'));
 			}

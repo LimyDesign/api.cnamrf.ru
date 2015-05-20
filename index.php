@@ -200,8 +200,8 @@ function get2GisRubrics($city_id)
 					'version' => '1.3',
 					'where' => $city_name,
 					'show_children' => '1'));
-				var_dump($url.$uri); die();
-				// $dublgis = json_decode(file_get_contents($url.$uri));
+				$dublgis = json_decode(file_get_contents($url.$uri));
+				var_dump($dublgis); die();
 				// foreach ($dublgis->result as $key => $value) {
 				// 	$id_parent = $value->id;
 				// 	$name_parent = pg_escape_string($value->name);

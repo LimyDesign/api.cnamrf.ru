@@ -217,7 +217,7 @@ function get2GisRubrics($city_id)
 				// 	}
 				// 	$query = "udate rubrics set name = '{$name_parent}', alias = '{$alias_parent}', city_id = {$city_id} where id = {$id_parent}; insert into rubrics (id, name, alias, city_id) select {$id_parent}, '{$name_parent}', '{$alias_parent}', {$city_id} where not exists (select 1 from rubrics where id = {$id_parent});";
 				// 	pg_query($query);
-				}
+				// }
 			} else {
 				return json_encode(array('error' => '6', 'message' => 'Access deny.'));
 			}

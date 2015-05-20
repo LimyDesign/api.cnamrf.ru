@@ -217,6 +217,7 @@ function get2GisRubrics()
 						pg_query($query);
 					}
 					echo 'Импорт рубрик для г. '.$cityName.' закончен.'."\n";
+					flush();
 				}
 			} else {
 				return json_encode(array('error' => '6', 'message' => 'Access deny.'));

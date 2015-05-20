@@ -34,6 +34,10 @@ switch ($cmd[0]) {
 		echo get2GisCities();
 		break;
 
+	case 'get2GisRubrics':
+		get2GisRubrics();
+		break;
+
 	case 'getCompanyList':
 		if (is_numeric($cmd[1])) {
 			$pageNum = $cmd[1] ? $cmd[1] : 1;

@@ -346,9 +346,49 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						'currency' => $dublgis->additional_info->currency,
 						'address_2' => $dublgis->additional_info->office);
 					foreach ($dublgis->contacts[0]->contacts as $contact) {
-						var_dump($contact);
+						if ($contact->type == 'phone') {
+							$json_return['phone'][] = array(
+								"VALUE" => $contact->value, 
+								"VALUE_TYPE" => "WORK");
+						} elseif ($contact->type == 'fax') {
+							$json_return['phone'][] = array(
+								"VALUE" => $contact->value,
+								"VALUE_TYPE" => "FAX");
+						} elseif ($contact->type == 'website') {
+							$json_return['web'][] = array(
+								"VALUE" => $contact->value,
+								"VALUE_TYPE" => "WORK");
+						} elseif ($contact->type == 'facebook') {
+							$json_return['web'][] = array(
+								"VALUE" => $contact->value,
+								"VALUE_TYPE" => "FACEBOOK");
+						} elseif ($contact->type == 'twitter') {
+							$json_return['web'][] = array(
+								"VALUE" => $contact->value,
+								"VALUE_TYPE" => "TWITTER");
+						} elseif ($contact->type == 'vkontakte') {
+							$json_return['web'][] = array(
+								"VALUE" => $contact->value,
+								"VALUE_TYPE" => "OTHER");
+						} elseif ($contact->type == 'vkontakte') {
+							$json_return['web'][] = array(
+								"VALUE" => $contact->value,
+								"VALUE_TYPE" => "OTHER");
+						} elseif ($contact->type == 'skype') {
+							$json_return['im'][] = array(
+								"VALUE" => $contact->value,
+								"VALUE_TYPE" => "SKYPE");
+						} elseif ($contact->type == 'icq') {
+							$json_return['im'][] = array(
+								"VALUE" => $contact->value,
+								"VALUE_TYPE" => "ICQ");
+						} elseif ($contact->type == 'jabber') {
+							$json_return['im'][] = array(
+								"VALUE" => $contact->value,
+								"VALUE_TYPE" => "JABBER");
+						}
 					}
-					die();
+					var_dump($dublgis); die();
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
 					$result = pg_query($query);

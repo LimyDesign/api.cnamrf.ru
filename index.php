@@ -191,7 +191,7 @@ function get2GisRubrics()
 				while ($row = pg_fetch_assoc($result)) {
 					$city_name = $row['name'];
 					$city_id = $row['id'];
-					echo 'Получение данных для г. '.$cityName.'...';
+					echo 'Получение рубрик для г. '.$cityName.'...'."\n";
 					flush();
 					$url = 'http://catalog.api.2gis.ru/rubricator?';
 					$uri = http_build_query(array(
@@ -216,6 +216,7 @@ function get2GisRubrics()
 						$query = "udate rubrics set name = '{$name_parent}', alias = '{$alias_parent}', city_id = {$city_id} where id = {$id_parent}; insert into rubrics (id, name, alias, city_id) select {$id_parent}, '{$name_parent}', '{$alias_parent}', {$city_id} where not exists (select 1 from rubrics where id = {$id_parent});";
 						pg_query($query);
 					}
+					echo 'Импорт рубрик для г. '.$cityName.' закончен.'."\n";
 				}
 			} else {
 				return json_encode(array('error' => '6', 'message' => 'Access deny.'));

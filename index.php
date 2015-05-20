@@ -194,12 +194,12 @@ function get2GisRubrics($city_id)
 				$query = "select name from cities where id = {$city_id}";
 				$result = pg_query($query);
 				$city_name = pg_fetch_result($result, 0, 'name');
-				// $url = 'http://catalog.api.2gis.ru/rubricator?';
-				// $uri = http_build_query(array(
-				// 	'key' => $conf['2gis']['key'],
-				// 	'version' => '1.3',
-				// 	'where' => $city_name,
-				// 	'show_children' => '1'));
+				$url = 'http://catalog.api.2gis.ru/rubricator?';
+				$uri = http_build_query(array(
+					'key' => $conf['2gis']['key'],
+					'version' => '1.3',
+					'where' => $city_name,
+					'show_children' => '1'));
 				var_dump($url.$uri); die();
 				// $dublgis = json_decode(file_get_contents($url.$uri));
 				// foreach ($dublgis->result as $key => $value) {

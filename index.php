@@ -198,7 +198,7 @@ function get2GisRubrics()
 						'key' => $conf['2gis']['key'],
 						'version' => '1.3',
 						'where' => $city_name,
-						'show_children' = '1'));
+						'show_children' => '1'));
 					$dublgis = json_decode(file_get_contents($url.$uri));
 					foreach ($dublgis->result as $key => $value) {
 						$id_parent = $value->id;

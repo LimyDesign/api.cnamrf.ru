@@ -194,34 +194,30 @@ function get2GisRubrics($city_id)
 				$query = "select name from cities where id = {$city_id}";
 				$result = pg_query($query);
 				$city_name = pg_fetch_result($result, 0, 'name');
-				echo 'Получение рубрик для г. '.$cityName.'...'."\n";
-				flush();
-				$url = 'http://catalog.api.2gis.ru/rubricator?';
-				$uri = http_build_query(array(
-					'key' => $conf['2gis']['key'],
-					'version' => '1.3',
-					'where' => $city_name,
-					'show_children' => '1'));
-				$dublgis = json_decode(file_get_contents($url.$uri));
-				foreach ($dublgis->result as $key => $value) {
-					$id_parent = $value->id;
-					$name_parent = pg_escape_string($value->name);
-					$alias_parent = pg_escape_string($value->alias);
-					if ($value->children) {
-						foreach ($value->children as $children) {
-							$id = $children->id;
-							$name = pg_escape_string($children->name);
-							$alias = pg_escape_string($children->alias);
-							$query = "update rubrics set name = '{$name}', alias = '{$alias}', parent_id = {$id_parent}, city_id = {$city_id} where id = {$id}; insert into rubrics (id, name, alias, parent_id, city_id) select {$id}, '{$name}', '{$alias}', {$id_parent}, {$city_id} where not exists (select 1 from rubrics where id = {$id});";
-							pg_query($query);
-						}
-					}
-					$query = "udate rubrics set name = '{$name_parent}', alias = '{$alias_parent}', city_id = {$city_id} where id = {$id_parent}; insert into rubrics (id, name, alias, city_id) select {$id_parent}, '{$name_parent}', '{$alias_parent}', {$city_id} where not exists (select 1 from rubrics where id = {$id_parent});";
-					pg_query($query);
+				var_dump($city_id, $city_name); die();
+				// $url = 'http://catalog.api.2gis.ru/rubricator?';
+				// $uri = http_build_query(array(
+				// 	'key' => $conf['2gis']['key'],
+				// 	'version' => '1.3',
+				// 	'where' => $city_name,
+				// 	'show_children' => '1'));
+				// $dublgis = json_decode(file_get_contents($url.$uri));
+				// foreach ($dublgis->result as $key => $value) {
+				// 	$id_parent = $value->id;
+				// 	$name_parent = pg_escape_string($value->name);
+				// 	$alias_parent = pg_escape_string($value->alias);
+				// 	if ($value->children) {
+				// 		foreach ($value->children as $children) {
+				// 			$id = $children->id;
+				// 			$name = pg_escape_string($children->name);
+				// 			$alias = pg_escape_string($children->alias);
+				// 			$query = "update rubrics set name = '{$name}', alias = '{$alias}', parent_id = {$id_parent}, city_id = {$city_id} where id = {$id}; insert into rubrics (id, name, alias, parent_id, city_id) select {$id}, '{$name}', '{$alias}', {$id_parent}, {$city_id} where not exists (select 1 from rubrics where id = {$id});";
+				// 			pg_query($query);
+				// 		}
+				// 	}
+				// 	$query = "udate rubrics set name = '{$name_parent}', alias = '{$alias_parent}', city_id = {$city_id} where id = {$id_parent}; insert into rubrics (id, name, alias, city_id) select {$id_parent}, '{$name_parent}', '{$alias_parent}', {$city_id} where not exists (select 1 from rubrics where id = {$id_parent});";
+				// 	pg_query($query);
 				}
-				echo 'Импорт рубрик для г. '.$cityName.' закончен.'."\n";
-				flush();
-				die();
 			} else {
 				return json_encode(array('error' => '6', 'message' => 'Access deny.'));
 			}

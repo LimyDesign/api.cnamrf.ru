@@ -201,22 +201,23 @@ function get2GisRubrics($city_id)
 					'where' => $city_name,
 					'show_children' => '1'));
 				$dublgis = json_decode(file_get_contents($url.$uri));
-				var_dump($dublgis); die();
+				$query = "DELETE FROM rubrics;\n\n";
+				file_put_contents('rubrics.sql', $query, LOCK_EX);
 				foreach ($dublgis->result as $result) {
 					$id_parent = $result->id;
 					$name_parent = pg_escape_string($result->name);
 					$alias_parent = pg_escape_string($result->alias);
+					$query = "\n"."INSERT INTO rubrics (id, name, alias, city_id) VALUES ({$id_parent}, '{$name_parent}', '{$alias_parent}', {$city_id});"."\n";
+					file_put_contents('rubrics.sql', $query, LOCK_EX | FILE_APPEND);
 					if ($result->children) {
 						foreach ($result->children as $children) {
 							$id = $children->id;
 							$name = pg_escape_string($children->name);
 							$alias = pg_escape_string($children->alias);
-							$query = "update rubrics set name = '{$name}', alias = '{$alias}', parent_id = {$id_parent}, city_id = {$city_id} where id = {$id}; insert into rubrics (id, name, alias, parent_id, city_id) select {$id}, '{$name}', '{$alias}', {$id_parent}, {$city_id} where not exists (select 1 from rubrics where id = {$id});";
-							pg_query($query);
+							$query = "INSERT INTO rubrics (id, name, alias, parent_id, city_id) VALUES ({$id}, '{$name}', '{$alias}', {$id_parent}, {$city_id});";
+							file_put_contents('rubrics.sql', $query, LOCK_EX | FILE_APPEND);
 						}
 					}
-					$query = "udate rubrics set name = '{$name_parent}', alias = '{$alias_parent}', city_id = {$city_id} where id = {$id_parent}; insert into rubrics (id, name, alias, city_id) select {$id_parent}, '{$name_parent}', '{$alias_parent}', {$city_id} where not exists (select 1 from rubrics where id = {$id_parent});";
-					pg_query($query);
 				}
 			} else {
 				return json_encode(array('error' => '6', 'message' => 'Access deny.'));

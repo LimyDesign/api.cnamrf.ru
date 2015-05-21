@@ -201,7 +201,7 @@ function get2GisRubrics($city_id)
 					'where' => $city_name,
 					'show_children' => '1'));
 				$dublgis = json_decode(file_get_contents($url.$uri));
-				$query = "DELETE FROM rubrics;\n\n";
+				$query = "DELETE FROM rubrics;\n";
 				file_put_contents('rubrics.sql', $query, LOCK_EX);
 				foreach ($dublgis->result as $result) {
 					$id_parent = $result->id;
@@ -214,7 +214,7 @@ function get2GisRubrics($city_id)
 							$id = $children->id;
 							$name = pg_escape_string($children->name);
 							$alias = pg_escape_string($children->alias);
-							$query = "INSERT INTO rubrics (id, name, alias, parent_id, city_id) VALUES ({$id}, '{$name}', '{$alias}', {$id_parent}, {$city_id});";
+							$query = "INSERT INTO rubrics (id, name, alias, parent_id, city_id) VALUES ({$id}, '{$name}', '{$alias}', {$id_parent}, {$city_id});"."\n";
 							file_put_contents('rubrics.sql', $query, LOCK_EX | FILE_APPEND);
 						}
 					}

@@ -203,14 +203,14 @@ function get2GisRubrics($city_id)
 				$dublgis = json_decode(file_get_contents($url.$uri));
 				$query = "-- Удаляем все данные из таблицы связанные именно с этим городом"."\n";
 				$query.= "DELETE FROM rubrics WHERE city_id = {$city_id};"."\n";
-				file_put_contents("rubrics-{$city_id}.sql", $query, LOCK_EX);
+				file_put_contents("/tmp/rubrics-{$city_id}.sql", $query, LOCK_EX);
 				foreach ($dublgis->result as $result) {
 					$id_parent = $result->id;
 					$name_parent = pg_escape_string($result->name);
 					$alias_parent = pg_escape_string($result->alias);
 					$query = "\n"."-- Добавляем родительскую рубрику"."\n";
 					$query.= "INSERT INTO rubrics (id, name, alias, city_id) VALUES ({$id_parent}, '{$name_parent}', '{$alias_parent}', {$city_id});"."\n";
-					file_put_contents("rubrics-{$city_id}.sql", $query, LOCK_EX | FILE_APPEND);
+					file_put_contents("/tmp/rubrics-{$city_id}.sql", $query, LOCK_EX | FILE_APPEND);
 					if ($result->children) {
 						$query = "-- Добавляем дочерние рубрики"."\n";
 						file_put_contents("rubrics-{$city_id}.sql", $query, LOCK_EX | FILE_APPEND);
@@ -219,7 +219,7 @@ function get2GisRubrics($city_id)
 							$name = pg_escape_string($children->name);
 							$alias = pg_escape_string($children->alias);
 							$query = "INSERT INTO rubrics (id, name, alias, parent_id, city_id) VALUES ({$id}, '{$name}', '{$alias}', {$id_parent}, {$city_id});"."\n";
-							file_put_contents("rubrics-{$city_id}.sql", $query, LOCK_EX | FILE_APPEND);
+							file_put_contents("/tmp/rubrics-{$city_id}.sql", $query, LOCK_EX | FILE_APPEND);
 						}
 					}
 				}

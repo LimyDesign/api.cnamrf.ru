@@ -219,6 +219,7 @@ function get2GisRubrics($city_id)
 						}
 					}
 				}
+				$json_return = array('error' => '0', 'sql_dump_created' => 'rubrics.sql');
 			} else {
 				return json_encode(array('error' => '6', 'message' => 'Access deny.'));
 			}

@@ -399,8 +399,8 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						'key' => $conf['2gis']['key'],
 						'version' => '1.3',
 						'q' => $dublgis->lon.','.$dublgis->lat));
-					$geoData = json_decode(file_get_contents($url.$uri));
-					print_r($geoData); die();
+					// $geoData = json_decode(file_get_contents($url.$uri));
+					print_r($dublgis); die();
 					$companyName = pg_escape_string($dublgis->name);
 					$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}')";
 					pg_query($query);
@@ -410,14 +410,13 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						'log' => $dublgis->lon,
 						'lat' => $dublgis->lat,
 						'name' => $dublgis->name,
-						'city_name' => $dublgis->city_name,
 						'address' => $dublgis->address,
-						'currency' => $dublgis->additional_info->currency,
 						'address_2' => $dublgis->additional_info->office,
-						'region' => $geoData['region'],
-						'province' => $geoData['province'],
-						'postal_code' => $geoData['postal_code'],
+						'city_name' => $dublgis->city_name,
+						'region' => $geoData->result[0]->attributes->district,
+						'postal_code' => $geoData->result[0]->attributes->index,
 						'industry' => getGeneralIndustry($dublgis->rubrics, $dublgis->city_name));
+						'currency' => $dublgis->additional_info->currency,
 					foreach ($dublgis->contacts[0]->contacts as $contact) {
 						if ($contact->type == 'phone') {
 							$json_return['phone'][] = array(
@@ -462,10 +461,15 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						}
 					}
 					if (count($dublgis->rubrics)) {
-						$json_return['comments'] = "<b>Виды деятельности:</b><ul>";
+						$json_return['comments'] = "<p><b>Виды деятельности:</b></p><ul>";
 						foreach ($dublgis->rubrics as $rubric) {
 							$json_return['comments'] .= '<li>'.$rubric.'</li>';
 						}
+						$json_return['comments'] .= '</ul>';
+					}
+					if ($json_return['comments']) {
+						$json_return['comments'] .= "<p>Дополнительная информация:</p><ul>"
+							. "<li><a href='http://2gis.ru/city/' target='_2gis'>Проложить маршрут от этой компании</a></li>"
 					}
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";

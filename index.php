@@ -394,6 +394,13 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						'id' => $id,
 						'hash' => $hash));
 					$dublgis = json_decode(file_get_contents($url.$uri));
+					$url = 'http://catalog.api.2gis.ru/geo/search?';
+					$uri = http_build_query(array(
+						'key' => $conf['2gis']['key'],
+						'version' => '1.3',
+						'q' => $dublgis->lon.','.$dublgis->lat));
+					$geoData = json_decode(file_get_contents($url.$uri));
+					print_r($geoData); die();
 					$companyName = pg_escape_string($dublgis->name);
 					$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}')";
 					pg_query($query);
@@ -406,7 +413,11 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						'city_name' => $dublgis->city_name,
 						'address' => $dublgis->address,
 						'currency' => $dublgis->additional_info->currency,
-						'address_2' => $dublgis->additional_info->office);
+						'address_2' => $dublgis->additional_info->office,
+						'region' => $geoData['region'],
+						'province' => $geoData['province'],
+						'postal_code' => $geoData['postal_code'],
+						'industry' => getGeneralIndustry($dublgis->rubrics, $dublgis->city_name));
 					foreach ($dublgis->contacts[0]->contacts as $contact) {
 						if ($contact->type == 'phone') {
 							$json_return['phone'][] = array(
@@ -450,7 +461,11 @@ function getCompanyProfile($api, $domain, $id, $hash)
 								"VALUE_TYPE" => "JABBER");
 						}
 					}
-					if ($dublgis->rubrics) {
+					if (count($dublgis->rubrics)) {
+						$json_return['comments'] = "<b>Виды деятельности:</b><ul>";
+						foreach ($dublgis->rubrics as $rubric) {
+							$json_return['comments'] .= '<li>'.$rubric.'</li>';
+						}
 					}
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
@@ -459,29 +474,9 @@ function getCompanyProfile($api, $domain, $id, $hash)
 					if ($balans >= $price) {
 						$query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '$text')";
 						pg_query($query);
-						$url = 'http://catalog.api.2gis.ru/search?';
-						$uri = http_build_query(array(
-							'key' => $conf['2gis']['key'],
-							'version' => '1.3',
-							'what' => $text,
-							'where' => $cityName,
-							'page' => $pageNum,
-							'pagesize' => 50));
-						$dublgis = json_decode(file_get_contents($url.$uri));
-						$result = array();
-						foreach ($dublgis->result as $key => $value) {
-							$result[$key]['id'] = $value->id;
-							$result[$key]['name'] = $value->name;
-							$result[$key]['hash'] = $value->hash;
-							$result[$key]['firm_group'] = $value->firm_group->count;
-							$result[$key]['address'] = $value->address;
-						}
-						$json_return = array(
-							'error' => '0', 
-							'total' => $dublgis->total,
-							'pagesize' => '50',
-							'page' => $pageNum,
-							'result' => $result);
+						// 
+						// Функция обработки и получения данных
+						// 
 					} else {
 						$json_return = array('error' => '5', 'message' => 'Not enough funds. Go to http://www.lead4crm.ru, and refill your account in any convenient way.');
 					}
@@ -495,6 +490,41 @@ function getCompanyProfile($api, $domain, $id, $hash)
 	} else {
 		return json_encode(array('error' => '2', 'message' => 'Not found API access key or not search text or not city number.'));
 	}
+}
+
+function getGeneralIndustry($rubrics, $city) 
+{
+	global $conf;
+	if ($conf['db']['type'] == 'postgres')
+	{
+		if (count($rubrics)) {
+			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@lead4crm.ru about this error.');
+			$parents = array();
+			foreach ($rubrics as $rubric) {
+				$query = "select parent_id from rubrics where city_id = (select id from cities where name = '{$city}')"
+				$result = pg_query($query);
+				$parents[] = pg_fetch_result($result, 0, 0);
+			}
+			$main_parent = $main_parent2 = array_count_values($parents);
+			arsort($main_parent2);
+			foreach ($main_parent2 as $parent_id => $count) {
+				if ($count > 1)
+					$query = "select name, alias from rubrics where id = {$parent_id}";
+				else {
+					$parent_id = key($main_parent);
+					$query = "select name, alias from rubrics where id = {$parent_id}";
+				}
+				break;
+			}
+			$result = pg_query($query);
+			$name = pg_fetch_result($result, 0, 'name');
+			$code = strtoupper(pg_fetch_result($result, 0, 'alias'));
+		} else {
+			$name = 'Другое';
+			$code = 'OTHER';
+		}
+	}
+	return array('code' => $code, 'name' => $name);
 }
 
 /**

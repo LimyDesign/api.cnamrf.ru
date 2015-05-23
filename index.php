@@ -501,7 +501,7 @@ function getGeneralIndustry($rubrics, $city)
 			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@lead4crm.ru about this error.');
 			$parents = array();
 			foreach ($rubrics as $rubric) {
-				$query = "select parent_id from rubrics where city_id = (select id from cities where name = '{$city}')"
+				$query = "select parent_id from rubrics where city_id = (select id from cities where name = '{$city}')";
 				$result = pg_query($query);
 				$parents[] = pg_fetch_result($result, 0, 0);
 			}

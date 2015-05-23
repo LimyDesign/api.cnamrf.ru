@@ -415,8 +415,8 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						'city_name' => $dublgis->city_name,
 						'region' => $geoData->result[0]->attributes->district,
 						'postal_code' => $geoData->result[0]->attributes->index,
-						'industry' => getGeneralIndustry($dublgis->rubrics, $dublgis->city_name));
 						'currency' => $dublgis->additional_info->currency,
+						'industry' => getGeneralIndustry($dublgis->rubrics, $dublgis->city_name));
 					foreach ($dublgis->contacts[0]->contacts as $contact) {
 						if ($contact->type == 'phone') {
 							$json_return['phone'][] = array(

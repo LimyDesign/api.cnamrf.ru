@@ -469,7 +469,7 @@ function getCompanyProfile($api, $domain, $id, $hash)
 					}
 					if ($json_return['comments']) {
 						$json_return['comments'] .= "<p>Дополнительная информация:</p><ul>"
-							. "<li><a href='http://2gis.ru/city/' target='_2gis'>Проложить маршрут от этой компании</a></li>"
+							. "<li><a href='http://2gis.ru/city/' target='_2gis'>Проложить маршрут от этой компании</a></li>";
 					}
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";

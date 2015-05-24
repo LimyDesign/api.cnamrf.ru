@@ -394,13 +394,13 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						'id' => $id,
 						'hash' => $hash));
 					$dublgis = json_decode(file_get_contents($url.$uri));
+					print_r($dublgis); die();
 					$url = 'http://catalog.api.2gis.ru/geo/search?';
 					$uri = http_build_query(array(
 						'key' => $conf['2gis']['key'],
 						'version' => '1.3',
 						'q' => $dublgis->lon.','.$dublgis->lat));
 					$geoData = json_decode(file_get_contents($url.$uri));
-					// print_r($dublgis); die();
 					$companyName = pg_escape_string($dublgis->name);
 					$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}')";
 					pg_query($query);
@@ -436,7 +436,7 @@ function getCompanyProfile($api, $domain, $id, $hash)
 								"VALUE_TYPE" => "FACEBOOK");
 						} elseif ($contact->type == 'twitter') {
 							$json_return['web'][] = array(
-								"VALUE" => $contact->value,
+								"VALUE" => substr($contact->value, 1),
 								"VALUE_TYPE" => "TWITTER");
 						} elseif ($contact->type == 'vkontakte') {
 							$json_return['web'][] = array(

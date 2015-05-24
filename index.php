@@ -440,7 +440,7 @@ function getCompanyProfile($api, $domain, $id, $hash)
 								"VALUE_TYPE" => "FACEBOOK");
 						} elseif ($contact->type == 'twitter') {
 							$json_return['web'][] = array(
-								"VALUE" => substr($contact->value, 1),
+								"VALUE" => $contact->value,
 								"VALUE_TYPE" => "TWITTER");
 						} elseif ($contact->type == 'vkontakte') {
 							$json_return['web'][] = array(

@@ -426,6 +426,10 @@ function getCompanyProfile($api, $domain, $id, $hash)
 							$json_return['phone'][] = array(
 								"VALUE" => $contact->value,
 								"VALUE_TYPE" => "FAX");
+						} elseif ($contact->type == 'email') {
+							$json_return['email'][] = array(
+								"VALUE" => $contact->value,
+								"VALUE_TYPE" => "WORK");
 						} elseif ($contact->type == 'website') {
 							$json_return['web'][] = array(
 								"VALUE" => 'http://'.$contact->alias,

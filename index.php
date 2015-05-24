@@ -394,7 +394,7 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						'id' => $id,
 						'hash' => $hash));
 					$dublgis = json_decode(file_get_contents($url.$uri));
-					print_r($dublgis); die();
+					// print_r($dublgis); die();
 					$url = 'http://catalog.api.2gis.ru/geo/search?';
 					$uri = http_build_query(array(
 						'key' => $conf['2gis']['key'],

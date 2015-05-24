@@ -399,8 +399,8 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						'key' => $conf['2gis']['key'],
 						'version' => '1.3',
 						'q' => $dublgis->lon.','.$dublgis->lat));
-					// $geoData = json_decode(file_get_contents($url.$uri));
-					print_r($dublgis); die();
+					$geoData = json_decode(file_get_contents($url.$uri));
+					// print_r($dublgis); die();
 					$companyName = pg_escape_string($dublgis->name);
 					$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}')";
 					pg_query($query);

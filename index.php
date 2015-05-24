@@ -428,7 +428,7 @@ function getCompanyProfile($api, $domain, $id, $hash)
 								"VALUE_TYPE" => "FAX");
 						} elseif ($contact->type == 'website') {
 							$json_return['web'][] = array(
-								"VALUE" => $contact->value,
+								"VALUE" => 'http://'.$contact->alias,
 								"VALUE_TYPE" => "WORK");
 						} elseif ($contact->type == 'facebook') {
 							$json_return['web'][] = array(
@@ -467,9 +467,20 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						}
 						$json_return['comments'] .= '</ul>';
 					}
+					$additional_info = "<p>Дополнительная информация:</p><ul>"
+							. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17/routeTab/to/{$dublgis->lon}%2C{dublgis->lat}%E2%95%8E{$url_name}?utm_source=profile&utm_medium=route_to&utm_campaign=partnerapi' target='_2gis'>Проложить маршрут до {$dublgis->name}</a></li>"
+							. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17/routeTab/from/{$dublgis->lon}%2C{$dublgis->lat}%E2%95%8E{$url_name}?utm_source=profile&utm_medium=route_from&utm_campaign=partnerapi' target='_2gis'>Проложить маршрут от {$dublgis->name}</a></li>"
+							. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/firm/{$dublgis->id}/entrance/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17?utm_source=profile&utm_medium=entrance&utm_campaign=partnerapi' target='_2gis'>Показать вход</a></li>"
+							. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/firm/{$dublgis->id}/photos/{$dublgis->id}/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17?utm_source=profile&utm_medium=photo&utm_campaign=partnerapi' target='_2gis'>Фотографии {$dublgis->name}</a></li>"
+								. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/firm/{$dublgis->id}/flamp/{$dublgis->id}/callout/firms-{$dublgis->id}/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17?utm_source=profile&utm_medium=review&utm_campaign=partnerapi' target='_2gis'>Отзывы о {$dublgis->name}</a></li>";
+					$additional_info_service_price = "<li><a href='{$dublgis->bookle_url}?utm_source=profile&utm_medium=booklet&utm_campaign=partnerapi' target='_2gis'>Услуги и цены {$dublgis->name}</a></li>";
 					if ($json_return['comments']) {
-						$json_return['comments'] .= "<p>Дополнительная информация:</p><ul>"
-							. "<li><a href='http://2gis.ru/city/' target='_2gis'>Проложить маршрут от этой компании</a></li>";
+						$url_name = rawurlencode($dublgis->name);
+						$json_return['comments'] .= $additional_info;
+						}
+						if ($dublgis->bookle_url) {
+							$json_return['comments'] .= 
+						}
 					}
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";

@@ -264,7 +264,7 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 	if ($apikey && $text && is_numeric($city)) {
 		if ($conf['db']['type'] == 'postgres')
 		{
-			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@lead4crm.ru about this error.');
+			$db_err_message = array('error' => 100, 'message' => 'Не могу подключиться к базе данных. Пожалуйста, напишите сообщение об этой ошибке по адресу: support@lead4crm.ru.');
 			$db = pg_connect('dbname='.$conf['db']['database']) or 
 				die(json_encode($db_err_message));
 			$query = "select name from cities where id = {$city}";
@@ -338,17 +338,17 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 							'page' => $pageNum,
 							'result' => $result);
 					} else {
-						$json_return = array('error' => '5', 'message' => 'Not enough funds. Go to http://www.lead4crm.ru, and refill your account in any convenient way.');
+						$json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите http://www.lead4crm.ru и пополните баланс любым удобным способом.');
 					}
 				}
 			} else {
-				$json_return = array('error' => '3', 'message' => 'Not found any users for your API access key.');
+				$json_return = array('error' => '3', 'message' => 'Не найден ни один пользователь по вашему ключу доступа.');
 			}
 			pg_close($db);
 		}
 		return json_encode($json_return);
 	} else {
-		return json_encode(array('error' => '2', 'message' => 'Not found API access key or not search text or not city number.'));
+		return json_encode(array('error' => '2', 'message' => 'Не найден ключ доступа или текст поиска или номер города.'));
 	}
 }
 
@@ -374,7 +374,7 @@ function getCompanyProfile($api, $domain, $id, $hash)
 	if ($apikey && $hash && is_numeric($id)) {
 		if ($conf['db']['type'] == 'postgres')
 		{
-			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@lead4crm.ru about this error.');
+			$db_err_message = array('error' => 100, 'message' => 'Не могу подключиться к базе данных. Пожалуйста, напишите сообщение об этой ошибке по адресу: support@lead4crm.ru.');
 			$db = pg_connect('dbname='.$conf['db']['database']) or 
 				die(json_encode($db_err_message));
 			$query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";
@@ -394,7 +394,6 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						'id' => $id,
 						'hash' => $hash));
 					$dublgis = json_decode(file_get_contents($url.$uri));
-					// print_r($dublgis); die();
 					$url = 'http://catalog.api.2gis.ru/geo/search?';
 					$uri = http_build_query(array(
 						'key' => $conf['2gis']['key'],
@@ -501,17 +500,17 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						// Функция обработки и получения данных
 						// 
 					} else {
-						$json_return = array('error' => '5', 'message' => 'Not enough funds. Go to http://www.lead4crm.ru, and refill your account in any convenient way.');
+						$json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите http://www.lead4crm.ru и пополните баланс любым удобным способом.');
 					}
 				}
 			} else {
-				$json_return = array('error' => '3', 'message' => 'Not found any users for your API access key.');
+				$json_return = array('error' => '3', 'message' => 'Не найден ни один пользователь по вашему ключу доступа.');
 			}
 			pg_close($db);
 		}
 		return json_encode($json_return);
 	} else {
-		return json_encode(array('error' => '2', 'message' => 'Not found API access key or not search text or not city number.'));
+		return json_encode(array('error' => '2', 'message' => 'Не найден ключ доступа или отсутствует хэш или отсутсвует идентификатор компании.'));
 	}
 }
 

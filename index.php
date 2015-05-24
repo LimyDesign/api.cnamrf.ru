@@ -472,7 +472,7 @@ function getCompanyProfile($api, $domain, $id, $hash)
 						$json_return['comments'] .= '</ul>';
 					}
 					$url_name = rawurlencode($dublgis->name);
-					$additional_info = "<p>Дополнительная информация:</p><ul>"
+					$additional_info = "<p><b>Дополнительная информация:</b></p><ul>"
 							. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17/routeTab/to/{$dublgis->lon}%2C{$dublgis->lat}%E2%95%8E{$url_name}?utm_source=profile&utm_medium=route_to&utm_campaign=partnerapi' target='_blank'>Проложить маршрут до {$dublgis->name}</a></li>"
 							. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17/routeTab/from/{$dublgis->lon}%2C{$dublgis->lat}%E2%95%8E{$url_name}?utm_source=profile&utm_medium=route_from&utm_campaign=partnerapi' target='_blank'>Проложить маршрут от {$dublgis->name}</a></li>"
 							. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/firm/{$dublgis->id}/entrance/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17?utm_source=profile&utm_medium=entrance&utm_campaign=partnerapi' target='_blank'>Показать вход</a></li>"

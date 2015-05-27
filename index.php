@@ -259,7 +259,8 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 
 	$apikey = preg_replace('/[^a-z0-9]/', '', $_REQUEST['apikey']);
 	$uClient = 'Lead4CRM';
-	$uCIP = sprintf("%u", ip2long(gethostbyname($domain)));
+	// $uCIP = sprintf("%u", ip2long(gethostbyname($domain)));
+	$uCIP = sprintf("%u", ip2long('127.0.0.1'));
 	
 	if ($apikey && $text && is_numeric($city)) {
 		if ($conf['db']['type'] == 'postgres')
@@ -369,7 +370,8 @@ function getCompanyProfile($api, $domain, $id, $hash)
 
 	$apikey = preg_replace('/[^a-z0-9]/', '', $_REQUEST['apikey']);
 	$uClient = 'Lead4CRM';
-	$uCIP = sprintf("%u", ip2long(gethostbyname($domain)));
+	// $uCIP = sprintf("%u", ip2long(gethostbyname($domain)));
+	$uCIP = sprintf("%u", ip2long('127.0.0.1'));
 	
 	if ($apikey && $hash && is_numeric($id)) {
 		if ($conf['db']['type'] == 'postgres')

@@ -498,9 +498,108 @@ function getCompanyProfile($api, $domain, $id, $hash)
 					if ($balans >= $price) {
 						$query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '$text')";
 						pg_query($query);
-						// 
-						// Функция обработки и получения данных
-						// 
+						$url = 'http://catalog.api.2gis.ru/profile?';
+						$uri = http_build_query(array(
+							'key' => $conf['2gis']['key'],
+							'version' => '1.3',
+							'id' => $id,
+							'hash' => $hash));
+						$dublgis = json_decode(file_get_contents($url.$uri));
+						$url = 'http://catalog.api.2gis.ru/geo/search?';
+						$uri = http_build_query(array(
+							'key' => $conf['2gis']['key'],
+							'version' => '1.3',
+							'q' => $dublgis->lon.','.$dublgis->lat));
+						$geoData = json_decode(file_get_contents($url.$uri));
+						$companyName = pg_escape_string($dublgis->name);
+						$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}')";
+						pg_query($query);
+						$json_return = array(
+							'error' => '0',
+							'id' => $dublgis->id,
+							'log' => $dublgis->lon,
+							'lat' => $dublgis->lat,
+							'name' => $dublgis->name,
+							'address' => $dublgis->address,
+							'address_2' => $dublgis->additional_info->office,
+							'city_name' => $dublgis->city_name,
+							'region' => $geoData->result[0]->attributes->district,
+							'postal_code' => $geoData->result[0]->attributes->index,
+							'currency' => $dublgis->additional_info->currency,
+							'industry' => getGeneralIndustry($dublgis->rubrics, $dublgis->city_name));
+						foreach ($dublgis->contacts[0]->contacts as $contact) {
+							if ($contact->type == 'phone') {
+								$json_return['phone'][] = array(
+									"VALUE" => $contact->value, 
+									"VALUE_TYPE" => "WORK");
+							} elseif ($contact->type == 'fax') {
+								$json_return['phone'][] = array(
+									"VALUE" => $contact->value,
+									"VALUE_TYPE" => "FAX");
+							} elseif ($contact->type == 'email') {
+								$json_return['email'][] = array(
+									"VALUE" => $contact->value,
+									"VALUE_TYPE" => "WORK");
+							} elseif ($contact->type == 'website') {
+								$json_return['web'][] = array(
+									"VALUE" => 'http://'.$contact->alias,
+									"VALUE_TYPE" => "WORK");
+							} elseif ($contact->type == 'facebook') {
+								$json_return['web'][] = array(
+									"VALUE" => $contact->value,
+									"VALUE_TYPE" => "FACEBOOK");
+							} elseif ($contact->type == 'twitter') {
+								$json_return['web'][] = array(
+									"VALUE" => $contact->value,
+									"VALUE_TYPE" => "TWITTER");
+							} elseif ($contact->type == 'vkontakte') {
+								$json_return['web'][] = array(
+									"VALUE" => $contact->value,
+									"VALUE_TYPE" => "OTHER");
+							} elseif ($contact->type == 'vkontakte') {
+								$json_return['web'][] = array(
+									"VALUE" => $contact->value,
+									"VALUE_TYPE" => "OTHER");
+							} elseif ($contact->type == 'skype') {
+								$json_return['im'][] = array(
+									"VALUE" => $contact->value,
+									"VALUE_TYPE" => "SKYPE");
+							} elseif ($contact->type == 'icq') {
+								$json_return['im'][] = array(
+									"VALUE" => $contact->value,
+									"VALUE_TYPE" => "ICQ");
+							} elseif ($contact->type == 'jabber') {
+								$json_return['im'][] = array(
+									"VALUE" => $contact->value,
+									"VALUE_TYPE" => "JABBER");
+							}
+						}
+						if (count($dublgis->rubrics)) {
+							$json_return['comments'] = "<p><b>Виды деятельности:</b></p><ul>";
+							foreach ($dublgis->rubrics as $rubric) {
+								$json_return['comments'] .= '<li>'.$rubric.'</li>';
+							}
+							$json_return['comments'] .= '</ul>';
+						}
+						$url_name = rawurlencode($dublgis->name);
+						$additional_info = "<p><b>Дополнительная информация:</b></p><ul>"
+								. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17/routeTab/to/{$dublgis->lon}%2C{$dublgis->lat}%E2%95%8E{$url_name}?utm_source=profile&utm_medium=route_to&utm_campaign=partnerapi' target='_blank'>Проложить маршрут до {$dublgis->name}</a></li>"
+								. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17/routeTab/from/{$dublgis->lon}%2C{$dublgis->lat}%E2%95%8E{$url_name}?utm_source=profile&utm_medium=route_from&utm_campaign=partnerapi' target='_blank'>Проложить маршрут от {$dublgis->name}</a></li>"
+								. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/firm/{$dublgis->id}/entrance/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17?utm_source=profile&utm_medium=entrance&utm_campaign=partnerapi' target='_blank'>Показать вход</a></li>"
+								. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/firm/{$dublgis->id}/photos/{$dublgis->id}/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17?utm_source=profile&utm_medium=photo&utm_campaign=partnerapi' target='_blank'>Фотографии {$dublgis->name}</a></li>"
+									. "<li><a href='http://2gis.ru/city/{$dublgis->project_id}/firm/{$dublgis->id}/flamp/{$dublgis->id}/callout/firms-{$dublgis->id}/center/{$dublgis->lon}%2C{$dublgis->lat}/zoom/17?utm_source=profile&utm_medium=review&utm_campaign=partnerapi' target='_blank'>Отзывы о {$dublgis->name}</a></li>";
+						$additional_info_service_price = "<li><a href='{$dublgis->bookle_url}?utm_source=profile&utm_medium=booklet&utm_campaign=partnerapi' target='_blank'>Услуги и цены {$dublgis->name}</a></li>";
+						if ($json_return['comments']) {
+							$json_return['comments'] .= $additional_info;
+							if ($dublgis->bookle_url) {
+								$json_return['comments'] .= $additional_info_service_price;
+							}
+						} else {
+							$json_return['comments'] = $additional_info;
+							if ($dublgis->bookle_url) {
+								$json_return['comments'] .= $additional_info_service_price;
+							}
+						}
 					} else {
 						$json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите http://www.lead4crm.ru и пополните баланс любым удобным способом.');
 					}

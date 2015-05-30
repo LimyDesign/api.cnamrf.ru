@@ -93,7 +93,7 @@ function getName($number)
 		if ($conf['db']['type'] == 'postgres')
 		{
 			$db_err_message = array('error' => '100', 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
-			$db = pg_connect('dbname='.$conf['db']['database']) or die(json_encode($db_err_message));
+			$db = pg_connect('host='.$conf['db']['host'].' dbname='.$conf['db']['database'].' user='.$conf['db']['username'].' password='.$conf['db']['password']) or die(json_encode($db_err_message));
 			$query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid = tariff.id where apikey = '{$uAPIKey}'";
 			$result = pg_query($query);
 			$uid = pg_fetch_result($result, 0, 'id');
@@ -138,7 +138,7 @@ function get2GisCities()
 		if ($conf['db']['type'] == 'postgres')
 		{
 			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
-			$db = pg_connect('dbname='.$conf['db']['database']) or die(json_encode($db_err_message));
+			$db = pg_connect('host='.$conf['db']['host'].' dbname='.$conf['db']['database'].' user='.$conf['db']['username'].' password='.$conf['db']['password']) or die(json_encode($db_err_message));
 			$query = "select is_admin from users where apikey = '{$uAPIKey}'";
 			$result = pg_query($query);
 			$is_admin = pg_fetch_result($result, 0, 'is_admin');
@@ -185,7 +185,7 @@ function get2GisRubrics($city_id)
 		if ($conf['db']['type'] == 'postgres')
 		{
 			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
-			$db = pg_connect('dbname='.$conf['db']['database']) or die(json_encode($db_err_message));
+			$db = pg_connect('host='.$conf['db']['host'].' dbname='.$conf['db']['database'].' user='.$conf['db']['username'].' password='.$conf['db']['password']) or die(json_encode($db_err_message));
 			$query = "select is_admin from users where apikey = '{$uAPIKey}'";
 			$result = pg_query($query);
 			$is_admin = pg_fetch_result($result, 0, 'is_admin');

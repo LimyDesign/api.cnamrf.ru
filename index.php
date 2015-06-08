@@ -146,9 +146,9 @@ function get2GisCities()
 				$url = 'http://catalog.api.2gis.ru/2.0/region/list?';
 				$uri = http_build_query(array(
 					'key' => $conf['2gis']['key'],
-					'locale' => 'ru_RU',
-					'locale_filter' => 'ru_RU',
-					'country_code_filter' => 'ru',
+					// 'locale' => 'ru_RU',
+					// 'locale_filter' => 'ru_RU',
+					// 'country_code_filter' => 'ru',
 					'format' => 'json',
 					'page_size' => '150'
 					));

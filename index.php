@@ -279,8 +279,8 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 			pg_free_result($result);
 			if ($uid) {
 				if ($qty) {
-					$query = "update users set qty = qty - 1 where id = {$uid}";
-					pg_query($query);
+					// $query = "update users set qty = qty - 1 where id = {$uid}";
+					// pg_query($query);
 					$text = pg_escape_string($text);
 					$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '$text')";
 					pg_query($query);
@@ -313,8 +313,8 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 					$result = pg_query($query);
 					$balans = pg_fetch_result($result, 0, 'balans');
 					if ($balans >= $price) {
-						$query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '$text')";
-						pg_query($query);
+						// $query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '$text')";
+						// pg_query($query);
 						$url = 'http://catalog.api.2gis.ru/search?';
 						$uri = http_build_query(array(
 							'key' => $conf['2gis']['key'],

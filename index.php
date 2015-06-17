@@ -306,13 +306,16 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 						'total' => $dublgis->total,
 						'pagesize' => '50',
 						'page' => $pageNum,
-						'qty' => $qty - 1,
+						'qty' => $qty,
 						'result' => $result);
 				} else {
 					$query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
 					$result = pg_query($query);
 					$balans = pg_fetch_result($result, 0, 'balans');
 					if ($balans >= $price) {
+						$query = "select qty + trunc((select sum(debet) - sum(credit) from log where uid = {$uid}) / (select price from tariff where id = (select tariffid2 from users where id = {$uid}))) as qty from users where id = {$uid}";
+						$result = pg_query($query);
+						$qty = pg_fetch_result($result, 0, 'qty');
 						// $query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '$text')";
 						// pg_query($query);
 						$url = 'http://catalog.api.2gis.ru/search?';
@@ -337,6 +340,7 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 							'total' => $dublgis->total,
 							'pagesize' => '50',
 							'page' => $pageNum,
+							'qty' => $qty,
 							'result' => $result);
 					} else {
 						$json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите http://www.lead4crm.ru и пополните баланс любым удобным способом.');

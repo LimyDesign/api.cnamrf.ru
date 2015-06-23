@@ -789,7 +789,7 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 
 function sendEmail($to, $from_email, $from_name, $body)
 {
-	if ($_SERVER['HTTP_ORIGIN'] == 'dfg')
+	if ($_SERVER['HTTP_ORIGIN'] == 'http://castle-if.github.io')
 	{
 		$response = $body;
 	}

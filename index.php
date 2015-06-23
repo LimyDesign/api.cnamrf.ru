@@ -59,6 +59,7 @@ switch ($cmd[0]) {
 		break;
 
 	case 'sendEmail':
+		header("Access-Control-Allow-Origin: castle-if.github.io");
 		echo sendEmail(
 			$_REQUEST['to'],
 			$_REQUEST['from_email'],

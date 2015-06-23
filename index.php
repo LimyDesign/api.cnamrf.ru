@@ -792,12 +792,13 @@ function sendEmail($to, $from_email, $from_name, $body)
 	if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
 		strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 	{
-		return $body;
+		$response = $body;
 	}
 	else
 	{
-		return $to;
+		$response = $to;
 	}
+	return json_encode(array('response' => $response));
 }
 
 /**

@@ -58,6 +58,14 @@ switch ($cmd[0]) {
 			$_REQUEST['hash']);
 		break;
 
+	case 'sendEmail':
+		echo sendEmail(
+			$_REQUEST['to'],
+			$_REQUEST['from_email'],
+			$_REQUEST['from_name'],
+			$_REQUEST['body']);
+		break;
+
 	default:
 		echo defaultResult();
 }
@@ -775,6 +783,15 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 				return array('error' => '7', 'message' => 'This city is not currently supported. If you can prove ownership of the number, add it to your personal phone book. But if you believe that in your town there 2GIS company, then email the customer support: support@cnamrf.ru.', 'city' => $city);
 			}
 		}
+	}
+}
+
+function sendEmail($to, $from_email, $from_name, $body)
+{
+	if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+		strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+	{
+		return $body;
 	}
 }
 

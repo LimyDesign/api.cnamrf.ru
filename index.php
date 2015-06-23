@@ -789,14 +789,13 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 
 function sendEmail($to, $from_email, $from_name, $body)
 {
-	if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-		strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+	if ($_SERVER['HTTP_ORIGIN'] == 'dfg')
 	{
 		$response = $body;
 	}
 	else
 	{
-		$response = $to;
+		$response = $_SERVER['HTTP_ORIGIN'];
 	}
 	return json_encode(array('response' => $response));
 }

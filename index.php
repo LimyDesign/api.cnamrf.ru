@@ -793,6 +793,10 @@ function sendEmail($to, $from_email, $from_name, $body)
 	{
 		return $body;
 	}
+	else
+	{
+		return $to;
+	}
 }
 
 /**

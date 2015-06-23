@@ -791,11 +791,14 @@ function sendEmail($to, $from_email, $from_name, $body)
 {
 	if ($_SERVER['HTTP_ORIGIN'] == 'http://castle-if.github.io')
 	{
-		$response = $body;
+		$body = "Есть новый узник: {$body}";
+		$headers = "From: {$from_name} <{$from_email}>\r\n";
+		mail($to, 'Архивариусу Замка If', $body, $headers);
+		$response = 'Все отлично!';
 	}
 	else
 	{
-		$response = $_SERVER['HTTP_ORIGIN'];
+		$response = 'Очень странно, но вы пытаетесь отправить письмо через мой сервер. У нас так не делается. Это запрещено законом.';
 	}
 	return json_encode(array('response' => $response));
 }

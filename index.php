@@ -789,7 +789,8 @@ function getData($number, $uid, $uClient, $uCIP, $conf, $price = 0)
 
 function sendEmail($to, $from_email, $from_name, $body)
 {
-	if ($_SERVER['HTTP_ORIGIN'] == 'http://castle-if.github.io')
+	if ($_SERVER['HTTP_ORIGIN'] == 'http://castle-if.github.io' or
+		$_SERVER['HTTP_ORIGIN'] == 'http://castle-if.ru')
 	{
 		$body = "Есть новый узник: {$body}";
 		$headers = "From: {$from_name} <{$from_email}>\r\n";

@@ -512,8 +512,8 @@ function getCompanyProfile($api, $domain, $id, $hash)
 					$result = pg_query($query);
 					$balans = pg_fetch_result($result, 0, 'balans');
 					if ($balans >= $price) {
-						$query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '$text')";
-						pg_query($query);
+						// $query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '$text')";
+						// pg_query($query);
 						$url = 'http://catalog.api.2gis.ru/profile?';
 						$uri = http_build_query(array(
 							'key' => $conf['2gis']['key'],
@@ -528,7 +528,7 @@ function getCompanyProfile($api, $domain, $id, $hash)
 							'q' => $dublgis->lon.','.$dublgis->lat));
 						$geoData = json_decode(file_get_contents($url.$uri));
 						$companyName = pg_escape_string($dublgis->name);
-						$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}')";
+						$query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '{$companyName}')";
 						pg_query($query);
 						$json_return = array(
 							'error' => '0',

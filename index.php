@@ -322,11 +322,14 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 					$result = pg_query($query);
 					$balans = pg_fetch_result($result, 0, 'balans');
 					if ($balans >= $price) {
-						$query = "select qty + trunc((select sum(debet) - sum(credit) from log where uid = {$uid}) / (select price from tariff where id = (select tariffid2 from users where id = {$uid}))) as qty from users where id = {$uid}";
-						$result = pg_query($query);
-						$qty = pg_fetch_result($result, 0, 'qty');
+						// $query = "select qty + trunc((select sum(debet) - sum(credit) from log where uid = {$uid}) / (select price from tariff where id = (select tariffid2 from users where id = {$uid}))) as qty from users where id = {$uid}";
+						// $result = pg_query($query);
+						// $qty = pg_fetch_result($result, 0, 'qty');
 						// $query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '$text')";
 						// pg_query($query);
+						$text = pg_escape_string($text);
+						$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '$text')";
+						pg_query($query);
 						$url = 'http://catalog.api.2gis.ru/search?';
 						$uri = http_build_query(array(
 							'key' => $conf['2gis']['key'],

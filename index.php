@@ -355,7 +355,7 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 							'qty' => $qty,
 							'result' => $result);
 					} else {
-						$json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите http://www.lead4crm.ru и пополните баланс любым удобным способом.');
+						$json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите https://www.lead4crm.ru и пополните баланс любым удобным способом.');
 					}
 				}
 			} else {
@@ -617,7 +617,7 @@ function getCompanyProfile($api, $domain, $id, $hash)
 							}
 						}
 					} else {
-						$json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите http://www.lead4crm.ru и пополните баланс любым удобным способом.');
+						$json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите https://www.lead4crm.ru и пополните баланс любым удобным способом.');
 					}
 				}
 			} else {

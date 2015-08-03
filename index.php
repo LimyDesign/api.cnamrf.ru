@@ -213,7 +213,7 @@ function getRubricList($apikey, $domain)
 			pg_close($db);
 			$json_return = array('error' => '0', 'rubrics' => $rubrics);
 		}
-		return json_encode($json_return);
+		return json_encode($json_return, JSON_UNESCAPED_UNICODE);
 	} else {
 		return json_encode(array('error' => '9', 'message' => 'Not found API access key or not specified client or not specified domain.'));
 	}

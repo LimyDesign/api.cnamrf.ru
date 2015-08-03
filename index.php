@@ -200,7 +200,7 @@ function getRubricList($apikey, $domain)
 		{
 			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
 			$db = pg_connect('host='.$conf['db']['host'].' dbname='.$conf['db']['database'].' user='.$conf['db']['username'].' password='.$conf['db']['password']) or die(json_encode($db_err_message));
-			$query = "select id, name, translit from rubrics where parent is null and (select id from users where apikey = '{$uAPIKey}') is not null limit 3";
+			$query = "select id, name, translit from rubrics where parent is null and (select id from users where apikey = '{$uAPIKey}') is not null";
 			$result = pg_query($query);
 			$i = 0;
 			while ($row = pg_fetch_assoc($result)) {

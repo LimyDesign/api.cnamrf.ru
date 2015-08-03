@@ -34,6 +34,10 @@ switch ($cmd[0]) {
 		echo get2GisCities();
 		break;
 
+	case 'getRubricList':
+		echo getRubricList($_REQUEST['apikey'], $_REQUEST['domain']);
+		break;
+
 	case 'get2GisRubrics':
 		echo get2GisRubrics($_REQUEST['city']);
 		break;
@@ -186,6 +190,35 @@ function get2GisCities()
 	}
 }
 
+function getRubricList($apikey, $domain)
+{
+	global $conf;
+	$uAPIKey = preg_replace('/[^a-z0-9]/', '', $apikey);
+	if ($uAPIKey && $domain) 
+	{
+		if ($conf['db']['type'] == 'postgres')
+		{
+			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
+			$db = pg_connect('host='.$conf['db']['host'].' dbname='.$conf['db']['database'].' user='.$conf['db']['username'].' password='.$conf['db']['password']) or die(json_encode($db_err_message));
+			$query = "select id, name, translit from rubrics where parent is null and (select id from users where apikey = '{$uAPIKey}') is not null limit 3";
+			$result = pg_query($query);
+			$i = 0;
+			while ($row = pg_fetch_assoc($result)) {
+				$rubrics[$i]['id'] = $row['id'];
+				$rubrics[$i]['name'] = $row['name'];
+				$rubrics[$i]['code'] = $row['translit'];
+				$i++;
+			}
+			pg_free_result($result);
+			pg_close($db);
+			$json_return = array('error' => '0', 'rubrics' => $rubrics);
+		}
+		return json_encode($json_return);
+	} else {
+		return json_encode(array('error' => '9', 'message' => 'Not found API access key or not specified client or not specified domain.'));
+	}
+}
+
 function get2GisRubrics($city_id)
 {
 	global $conf;
@@ -291,7 +324,7 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 					// $query = "update users set qty = qty - 1 where id = {$uid}";
 					// pg_query($query);
 					$text = pg_escape_string($text);
-					$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '$text')";
+					$query = "insert into log (uid, client, ip, text, domain) values ({$uid}, '{$uClient}', {$uCIP}, '{$text}', '{$domain}')";
 					pg_query($query);
 					$url = 'http://catalog.api.2gis.ru/search?';
 					$uri = http_build_query(array(
@@ -328,7 +361,7 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
 						// $query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '$text')";
 						// pg_query($query);
 						$text = pg_escape_string($text);
-						$query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '$text')";
+						$query = "insert into log (uid, client, ip, text, domain) values ({$uid}, '{$uClient}', {$uCIP}, '{$text}', '{$domain}')";
 						pg_query($query);
 						$url = 'http://catalog.api.2gis.ru/search?';
 						$uri = http_build_query(array(

@@ -205,7 +205,7 @@ function getRubricList($apikey, $domain, $full)
       $db = pg_connect('host='.$conf['db']['host'].' dbname='.$conf['db']['database'].' user='.$conf['db']['username'].' password='.$conf['db']['password']) or die(json_encode($db_err_message));
       if ($full)
       {
-        $query = "select id, name, translit, parent from rubrics where (select id from users where qpikey = '{$uAPIKey}') is not null";
+        $query = "select id, name, translit, parent from rubrics where (select id from users where apikey = '{$uAPIKey}') is not null";
       }
       else
       {

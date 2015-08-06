@@ -336,7 +336,7 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum)
       $query = "select name from cities where id = {$city}";
       $result = pg_query($query);
       $cityName = pg_fetch_result($result, 0, 'name');
-      $query = "select users.id, users.qty + truc((select sum(debet) - sum(credit) from log where uid = (select id from users where apikey = '{$apikey}')) / tariff.price) as qty, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";
+      $query = "select users.id, users.qty + trunc((select sum(debet) - sum(credit) from log where uid = (select id from users where apikey = '{$apikey}')) / tariff.price) as qty, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";
       $result = pg_query($query);
       $uid = pg_fetch_result($result, 0, 'id');
       $qty = pg_fetch_result($result, 0, 'qty');

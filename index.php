@@ -57,6 +57,18 @@ switch ($cmd[0]) {
       $pageNum);
     break;
 
+  case 'getCompanyListByRubric':
+    if (is_numeric($cmd[1])) {
+      $pageNum = $cmd[1] ? $cmd[1] : 1;
+    }
+    echo getCompanyListByRubric(
+      $_REQUEST['apikey'],
+      $_REQUEST['rubric'],
+      $_REQUEST['city'],
+      $_REQUEST['domain'],
+      $pageNum);
+    break;
+
   case 'getCompanyProfile':
     echo getCompanyProfile(
       $_REQUEST['apikey'],
@@ -306,7 +318,7 @@ function get2GisRubrics($city_id)
  * @param  integer $pageNum Номер страницы запрашиваемой в справочнике 2ГИС
  * @return string           Данные в формате JSON
  */
-function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1) 
+function getCompanyList($apikey, $text, $city, $domain, $pageNum) 
 {
   global $conf;
 
@@ -361,11 +373,14 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
             'page' => $pageNum,
             'qty' => $qty,
             'result' => $result);
-        } else {
+        } 
+        else 
+        {
           $query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
           $result = pg_query($query);
           $balans = pg_fetch_result($result, 0, 'balans');
-          if ($balans >= $price) {
+          if ($balans >= $price) 
+          {
             // $query = "select qty + trunc((select sum(debet) - sum(credit) from log where uid = {$uid}) / (select price from tariff where id = (select tariffid2 from users where id = {$uid}))) as qty from users where id = {$uid}";
             // $result = pg_query($query);
             // $qty = pg_fetch_result($result, 0, 'qty');
@@ -398,18 +413,132 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum = 1)
               'page' => $pageNum,
               'qty' => $qty,
               'result' => $result);
-          } else {
+          } 
+          else 
+          {
             $json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите https://www.lead4crm.ru и пополните баланс любым удобным способом.');
           }
         }
-      } else {
+      } 
+      else 
+      {
         $json_return = array('error' => '3', 'message' => 'Не найден ни один пользователь по вашему ключу доступа.');
       }
       pg_close($db);
     }
     return json_encode($json_return);
   } else {
-    return json_encode(array('error' => '2', 'message' => 'Не найден ключ доступа или текст поиска или номер города.'));
+    return json_encode(array('error' => '2', 'message' => 'Не найден ключ доступа, текст поиска или идентификатор города.'));
+  }
+}
+
+function getCompanyListByRubric($apikey, $rubric, $city, $domain, $pageNum)
+{
+  global $conf;
+  $apikey = preg_replace('/[^a-z0-9]/', '', $_REQUEST['apikey']);
+  $uClient = 'Lead4CRM';
+  $uCIP = sprintf("%u", ip2long('127.0.0.1'));
+
+  if ($apikey && $rubric && is_numeric($city))
+  {
+    if ($conf['db']['type'] == 'postgres')
+    {
+      $db_err_message = array('error' => 100, 'message' => 'Не могу подключиться к базе данных. Пожалуйста, напишите сообщение об этой ошибке по адресу: support@lead4crm.ru.');
+      $db = pg_connect('dbname='.$conf['db']['database']) or 
+        die(json_encode($db_err_message));
+      $query = "select name from cities where id = {$city}";
+      $result = pg_query($query);
+      $cityName = pg_fetch_result($result, 0, 'name');
+      $query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";
+      $result = pg_query($query);
+      $uid = pg_fetch_result($result, 0, 'id');
+      $qty = pg_fetch_result($result, 0, 'qty');
+      $price = pg_fetch_result($result, 0, 'price');
+      pg_free_result($result);
+      if ($uid) 
+      {
+        if ($qty) 
+        {
+          $rubric = pg_escape_string($rubric);
+          $query = "insert into log (uid, client, ip, text, domain) values ({$uid}, '{$uClient}', {$uCIP}, '{$rubric}', '{$domain}')";
+          pg_query($query);
+          $url = 'http://catalog.api.2gis.ru/searchinrubric?';
+          $uri = http_build_query(array(
+            'key' => $conf['2gis']['key'],
+            'version' => '1.3',
+            'what' => $rubric,
+            'where' => $cityName,
+            'page' => $pageNum,
+            'pagesize' => 50));
+          $dublgis = json_decode(file_get_contents($url.$uri));
+          $result = array();
+          foreach ($dublgis->result as $key => $value) {
+            $result[$key]['id'] = $value->id;
+            $result[$key]['name'] = $value->name;
+            $result[$key]['hash'] = $value->hash;
+            $result[$key]['firm_group'] = $value->firm_group->count;
+            $result[$key]['address'] = $value->address;
+          }
+          $json_return = array(
+            'error' => '0', 
+            'total' => $dublgis->total,
+            'pagesize' => '50',
+            'page' => $pageNum,
+            'qty' => $qty,
+            'result' => $result);
+        }
+        else
+        {
+          $query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
+          $result = pg_query($query);
+          $balans = pg_fetch_result($result, 0, 'balans');
+          if ($balans >= $price) 
+          {
+            $rubric = pg_escape_string($rubric);
+            $query = "insert into log (uid, client, ip, text, domain) values ({$uid}, '{$uClient}', {$uCIP}, '{$rubric}', '{$domain}')";
+            pg_query($query);
+            $url = 'http://catalog.api.2gis.ru/search?';
+            $uri = http_build_query(array(
+              'key' => $conf['2gis']['key'],
+              'version' => '1.3',
+              'what' => $rubric,
+              'where' => $cityName,
+              'page' => $pageNum,
+              'pagesize' => 50));
+            $dublgis = json_decode(file_get_contents($url.$uri));
+            $result = array();
+            foreach ($dublgis->result as $key => $value) {
+              $result[$key]['id'] = $value->id;
+              $result[$key]['name'] = $value->name;
+              $result[$key]['hash'] = $value->hash;
+              $result[$key]['firm_group'] = $value->firm_group->count;
+              $result[$key]['address'] = $value->address;
+            }
+            $json_return = array(
+              'error' => '0', 
+              'total' => $dublgis->total,
+              'pagesize' => '50',
+              'page' => $pageNum,
+              'qty' => $qty,
+              'result' => $result);
+          }
+          else
+          {
+            $json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите https://www.lead4crm.ru и пополните баланс любым удобным способом.');
+          }
+        }
+      }
+      else
+      {
+        $json_return = array('error' => '3', 'message' => 'Не найден ни один пользователь по вашему ключу доступа.');
+      }
+      pg_close($db);
+    }
+    return json_encode($json_return);
+  }
+  else
+  {
+    return json_encode(array('error' => '10', 'message' => 'Не найден ключ доступа, рубрика или идентификатор города.'));
   }
 }
 

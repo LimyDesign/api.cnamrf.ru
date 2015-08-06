@@ -35,7 +35,10 @@ switch ($cmd[0]) {
 		break;
 
 	case 'getRubricList':
-		echo getRubricList($_REQUEST['apikey'], $_REQUEST['domain']);
+		echo getRubricList(
+			$_REQUEST['apikey'], 
+			$_REQUEST['domain'],
+			$_REQUEST['full']);
 		break;
 
 	case 'get2GisRubrics':
@@ -190,7 +193,7 @@ function get2GisCities()
 	}
 }
 
-function getRubricList($apikey, $domain)
+function getRubricList($apikey, $domain, $full)
 {
 	global $conf;
 	$uAPIKey = preg_replace('/[^a-z0-9]/', '', $apikey);
@@ -200,13 +203,22 @@ function getRubricList($apikey, $domain)
 		{
 			$db_err_message = array('error' => 100, 'message' => 'Unable to connect to database. Please send message to support@cnamrf.ru about this error.');
 			$db = pg_connect('host='.$conf['db']['host'].' dbname='.$conf['db']['database'].' user='.$conf['db']['username'].' password='.$conf['db']['password']) or die(json_encode($db_err_message));
-			$query = "select id, name, translit from rubrics where parent is null and (select id from users where apikey = '{$uAPIKey}') is not null";
+			if ($full)
+			{
+				$query = "select id, name, translit, parent from rubrics where (select id from users where qpikey = '{$uAPIKey}') is not null";
+			}
+			else
+			{
+				$query = "select id, name, translit from rubrics where parent is null and (select id from users where apikey = '{$uAPIKey}') is not null";
+			}
 			$result = pg_query($query);
 			$i = 0;
 			while ($row = pg_fetch_assoc($result)) {
 				$rubrics[$i]['id'] = $row['id'];
 				$rubrics[$i]['name'] = $row['name'];
 				$rubrics[$i]['code'] = $row['translit'];
+				if ($full)
+					$rubrics[$i]['parent'] = $row['parent'];
 				$i++;
 			}
 			pg_free_result($result);

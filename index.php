@@ -838,7 +838,7 @@ function getGeneralIndustry($rubrics)
         $query = "select parent from rubrics where name = '{$rubric}'";
         $result = pg_query($query);
         $parent_id1 = pg_fetch_result($result, 0, 0);
-        $query = "select parent from rubrics where id = {$parent_id}";
+        $query = "select parent from rubrics where id = {$parent_id1}";
         $result = pg_query($query);
         $parent_id2 = pg_fetch_result($result, 0, 0);
         if ($parent_id2) 

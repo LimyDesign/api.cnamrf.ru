@@ -74,7 +74,7 @@ switch ($cmd[0]) {
       $_REQUEST['apikey'],
       $_REQUEST['domain'],
       $_REQUEST['id'],
-      $_REQUEST['hash']
+      $_REQUEST['hash'],
       $_REQUEST['auid']);
     break;
 

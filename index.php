@@ -626,7 +626,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
             'region' => $geoData->result[0]->attributes->district,
             'postal_code' => $geoData->result[0]->attributes->index,
             'currency' => $dublgis->additional_info->currency,
-            'industry' => getGeneralIndustry($dublgis->rubrics, $dublgis->city_name));
+            'industry' => getGeneralIndustry($dublgis->rubrics));
           foreach ($dublgis->contacts[0]->contacts as $contact) {
             if ($contact->type == 'phone') {
               $json_return['phone'][] = array(
@@ -736,7 +736,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               'region' => $geoData->result[0]->attributes->district,
               'postal_code' => $geoData->result[0]->attributes->index,
               'currency' => $dublgis->additional_info->currency,
-              'industry' => getGeneralIndustry($dublgis->rubrics, $dublgis->city_name));
+              'industry' => getGeneralIndustry($dublgis->rubrics));
             foreach ($dublgis->contacts[0]->contacts as $contact) {
               if ($contact->type == 'phone') {
                 $json_return['phone'][] = array(
@@ -825,7 +825,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
   }
 }
 
-function getGeneralIndustry($rubrics, $city) 
+function getGeneralIndustry($rubrics) 
 {
   global $conf;
   if ($conf['db']['type'] == 'postgres')
@@ -835,7 +835,7 @@ function getGeneralIndustry($rubrics, $city)
       $parents = array();
       foreach ($rubrics as $rubric) {
         $rubric = pg_escape_string($rubric);
-        $query = "select parent_id from rubrics where name = '{$rubric}' and city_id = (select id from cities where name = '{$city}')";
+        $query = "select parent from rubrics where name = '{$rubric}'";
         $result = pg_query($query);
         $parents[] = pg_fetch_result($result, 0, 0);
       }
@@ -843,16 +843,16 @@ function getGeneralIndustry($rubrics, $city)
       arsort($main_parent2);
       foreach ($main_parent2 as $parent_id => $count) {
         if ($count > 1)
-          $query = "select name, alias from rubrics where id = {$parent_id}";
+          $query = "select name, translit from rubrics where id = {$parent_id}";
         else {
           $parent_id = key($main_parent);
-          $query = "select name, alias from rubrics where id = {$parent_id}";
+          $query = "select name, translit from rubrics where id = {$parent_id}";
         }
         break;
       }
       $result = pg_query($query);
       $name = pg_fetch_result($result, 0, 'name');
-      $code = strtoupper(pg_fetch_result($result, 0, 'alias'));
+      $code = pg_fetch_result($result, 0, 'translit');
     } else {
       $name = 'Другое';
       $code = 'OTHER';

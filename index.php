@@ -74,7 +74,8 @@ switch ($cmd[0]) {
       $_REQUEST['apikey'],
       $_REQUEST['domain'],
       $_REQUEST['id'],
-      $_REQUEST['hash']);
+      $_REQUEST['hash']
+      $_REQUEST['auid']);
     break;
 
   case 'sendEmail':
@@ -304,7 +305,7 @@ function get2GisRubrics($city_id)
  * Функция получает список компаний по поисковой строке $text
  * в указанном городе $city для пользователя $apikey с
  * запросом от указанного доменного имени $domain.
- * Функция возкращает данные в формате JSON.
+ * Функция возвращает данные в формате JSON.
  *
  * В случае успеха возвращает JSON-строку с нулевым кодом ошибки (error).
  *
@@ -432,6 +433,24 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum)
   }
 }
 
+/**
+ * Функция получает список компаний по указанной рубрике $rubric
+ * в указанном городе $city для пользователя $apikey с
+ * запросом от указанного доменного имени $domain.
+ * Функция возвращает данные в формате JSON.
+ *
+ * В случае успеха возвращает JSON-строку с нулевым кодом ошибки (error).
+ *
+ * В случае неудачи возвращает JSON-строку с кодом ошибки (error)
+ * и сообщением самой ошибки (message).
+ * 
+ * @param  string  $apikey  Пользовательский ключ доступа
+ * @param  string  $rubric  Название рубрики
+ * @param  integer $city    Индентификатор города
+ * @param  string  $domain  Домен пользовательского Битрикс24
+ * @param  integer $pageNum Номер страницы
+ * @return string           Данные в формате JSON
+ */
 function getCompanyListByRubric($apikey, $rubric, $city, $domain, $pageNum)
 {
   global $conf;
@@ -553,7 +572,7 @@ function getCompanyListByRubric($apikey, $rubric, $city, $domain, $pageNum)
  * @param  string $hash   Уникальный хэш филиала выдаваемый 2ГИС
  * @return string         Массив данных в JSON-формате
  */
-function getCompanyProfile($api, $domain, $id, $hash) 
+function getCompanyProfile($api, $domain, $id, $hash, $auid) 
 {
   global $conf;
 
@@ -592,10 +611,11 @@ function getCompanyProfile($api, $domain, $id, $hash)
             'q' => $dublgis->lon.','.$dublgis->lat));
           $geoData = json_decode(file_get_contents($url.$uri));
           $companyName = pg_escape_string($dublgis->name);
-          $query = "insert into log (uid, client, ip, text) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}')";
+          $query = "insert into log (uid, client, ip, text, domain) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}', '{$domain}')";
           pg_query($query);
           $json_return = array(
             'error' => '0',
+            'auid' => $auid,
             'id' => $dublgis->id,
             'log' => $dublgis->lon,
             'lat' => $dublgis->lat,
@@ -701,10 +721,11 @@ function getCompanyProfile($api, $domain, $id, $hash)
               'q' => $dublgis->lon.','.$dublgis->lat));
             $geoData = json_decode(file_get_contents($url.$uri));
             $companyName = pg_escape_string($dublgis->name);
-            $query = "insert into log (uid, credit, client, ip, text) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '{$companyName}')";
+            $query = "insert into log (uid, credit, client, ip, text, domain) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '{$companyName}', '{$domain}')";
             pg_query($query);
             $json_return = array(
               'error' => '0',
+              'auid' => $auid,
               'id' => $dublgis->id,
               'log' => $dublgis->lon,
               'lat' => $dublgis->lat,

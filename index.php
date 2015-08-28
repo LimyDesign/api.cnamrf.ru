@@ -660,21 +660,22 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
             {
               if ($contact->type == 'phone') {
                 $phone = $contact->value;
+                $pwop = substr($phone, 1);
                 for ($x = 0; $x < count($mask); $x++)
                 {
-                  if (substr($contact->value, 1, 5) == $mask[$x][2])
+                  if (substr($pwop, 2, 5) == $mask[$x][2])
                   {
-                    $phone = '+7 (' . $mask[$x][2] . ') ' . substr($contact->value, 6, 1) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    $phone = '+7 (' . $mask[$x][2] . ') ' . substr($pwop, 6, 1) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                     break;
                   }
-                  elseif (substr($contact->value, 1, 4) == $mask[$x][1])
+                  elseif (substr($pwop, 1, 4) == $mask[$x][1])
                   {
-                    $phone = '+7 (' . $mask[$x][1] . ') ' . substr($contact->value, 5, 2) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    $phone = '+7 (' . $mask[$x][1] . ') ' . substr($pwop, 5, 2) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                     break;
                   }
                   else
                   {
-                    $phone = '+7 (' . substr($contact->value, 1, 3) . ') ' . substr($contact->value, 4, 3) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    $phone = '+7 (' . substr($pwop, 1, 3) . ') ' . substr($pwop, 4, 3) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                   }
                 }
                 $json_return['phone'][] = array(
@@ -682,21 +683,22 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
                   "VALUE_TYPE" => "WORK");
               } elseif ($contact->type == 'fax') {
                 $phone = $contact->value;
+                $pwop = substr($phone, 1);
                 for ($x = 0; $x < count($mask); $x++)
                 {
-                  if (substr($contact->value, 1, 5) == $mask[$x][2])
+                  if (substr($pwop, 1, 5) == $mask[$x][2])
                   {
-                    $phone = '+7 (' . $mask[$x][2] . ') ' . substr($contact->value, 6, 1) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    $phone = '+7 (' . $mask[$x][2] . ') ' . substr($pwop, 6, 1) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                     break;
                   }
-                  elseif (substr($contact->value, 1, 4) == $mask[$x][1])
+                  elseif (substr($pwop, 1, 4) == $mask[$x][1])
                   {
-                    $phone = '+7 (' . $mask[$x][1] . ') ' . substr($contact->value, 5, 2) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    $phone = '+7 (' . $mask[$x][1] . ') ' . substr($pwop, 5, 2) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                     break;
                   }
                   else
                   {
-                    $phone = '+7 (' . substr($contact->value, 1, 3) . ') ' . substr($contact->value, 4, 3) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    $phone = '+7 (' . substr($pwop, 1, 3) . ') ' . substr($pwop, 4, 3) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                   }
                 }
                 $json_return['phone'][] = array(
@@ -819,21 +821,22 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               {
                 if ($contact->type == 'phone') {
                   $phone = $contact->value;
+                  $pwop = substr($phone, 1);
                   for ($x = 0; $x < count($mask); $x++)
                   {
-                    if (substr($contact->value, 1, 5) == $mask[$x][2])
+                    if (substr($pwop, 1, 5) == $mask[$x][2])
                     {
-                      $phone = '+7 (' . $mask[$x][2] . ') ' . substr($contact->value, 6, 1) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                      $phone = '+7 (' . $mask[$x][2] . ') ' . substr($pwop, 6, 1) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                       break;
                     }
-                    elseif (substr($contact->value, 1, 4) == $mask[$x][1])
+                    elseif (substr($pwop, 1, 4) == $mask[$x][1])
                     {
-                      $phone = '+7 (' . $mask[$x][1] . ') ' . substr($contact->value, 5, 2) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                      $phone = '+7 (' . $mask[$x][1] . ') ' . substr($pwop, 5, 2) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                       break;
                     }
                     else
                     {
-                      $phone = '+7 (' . substr($contact->value, 1, 3) . ') ' . substr($contact->value, 4, 3) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                      $phone = '+7 (' . substr($pwop, 1, 3) . ') ' . substr($pwop, 4, 3) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                     }
                   }
                   $json_return['phone'][] = array(
@@ -841,21 +844,22 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
                     "VALUE_TYPE" => "WORK");
                 } elseif ($contact->type == 'fax') {
                   $phone = $contact->value;
+                  $pwop = substr($phone, 1);
                   for ($x = 0; $x < count($mask); $x++)
                   {
-                    if (substr($contact->value, 1, 5) == $mask[$x][2])
+                    if (substr($pwop, 1, 5) == $mask[$x][2])
                     {
-                      $phone = '+7 (' . $mask[$x][2] . ') ' . substr($contact->value, 6, 1) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                      $phone = '+7 (' . $mask[$x][2] . ') ' . substr($pwop, 6, 1) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                       break;
                     }
-                    elseif (substr($contact->value, 1, 4) == $mask[$x][1])
+                    elseif (substr($pwop, 1, 4) == $mask[$x][1])
                     {
-                      $phone = '+7 (' . $mask[$x][1] . ') ' . substr($contact->value, 5, 2) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                      $phone = '+7 (' . $mask[$x][1] . ') ' . substr($pwop, 5, 2) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                       break;
                     }
                     else
                     {
-                      $phone = '+7 (' . substr($contact->value, 1, 3) . ') ' . substr($contact->value, 4, 3) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                      $phone = '+7 (' . substr($pwop, 1, 3) . ') ' . substr($pwop, 4, 3) . '-' . substr($pwop, 7, 2) . '-' . substr($pwop, 9, 2);
                     }
                   }
                   $json_return['phone'][] = array(

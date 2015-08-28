@@ -612,19 +612,21 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
             'version' => '1.3',
             'id' => $id,
             'hash' => $hash));
-          $dublgis = json_decode(file_get_contents($url.$uri));
+          $cp_json = file_get_contents($url.$uri);
+          $dublgis = json_decode($cp_json);
           $url = 'http://catalog.api.2gis.ru/geo/search?';
           $uri = http_build_query(array(
             'key' => $conf['2gis']['key'],
             'version' => '1.3',
             'q' => $dublgis->lon.','.$dublgis->lat));
-          $geoData = json_decode(file_get_contents($url.$uri));
+          $gd_json = file_get_contents($url.$uri);
+          $geoData = json_decode($gd_json);
           $companyName = pg_escape_string($dublgis->name);
           $query = "insert into log (uid, client, ip, text, domain) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}', '{$domain}') returning id";
           $result = pg_query($query);
           $logId = pg_fetch_result($result, 0, 'id');
-          $cp = pg_escape_string($dublgis);
-          $gd = pg_escape_string($geoData);
+          $cp = pg_escape_string($cp_json);
+          $gd = pg_escape_string($gd_json);
           $query = "insert into cache (logId, companyProfile, geoData) values ({$logId}, '{$cp}', '{$gd}')";
           pg_query($query);
           $json_return = array(
@@ -727,19 +729,21 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               'version' => '1.3',
               'id' => $id,
               'hash' => $hash));
-            $dublgis = json_decode(file_get_contents($url.$uri));
+            $cp_json = file_get_contents($url.$uri);
+            $dublgis = json_decode($cp_json);
             $url = 'http://catalog.api.2gis.ru/geo/search?';
             $uri = http_build_query(array(
               'key' => $conf['2gis']['key'],
               'version' => '1.3',
               'q' => $dublgis->lon.','.$dublgis->lat));
-            $geoData = json_decode(file_get_contents($url.$uri));
+            $gd_json = file_get_contents($url.$uri);
+            $geoData = json_decode($gd_json);
             $companyName = pg_escape_string($dublgis->name);
             $query = "insert into log (uid, credit, client, ip, text, domain) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '{$companyName}', '{$domain}') returning id";
             $result = pg_query($query);
             $logId = pg_fetch_result($result, 0, 'id');
-            $cp = pg_escape_string($dublgis);
-            $gd = pg_escape_string($geoData);
+            $cp = pg_escape_string($cp_json);
+            $gd = pg_escape_string($gd_json);
             $query = "insert into cache (logId, companyProfile, geoData) values ({$logId}, '{$cp}', '{$gd}')";
             pg_query($query);
             $json_return = array(
@@ -875,19 +879,21 @@ function getCompanyProfile_dev($api, $domain, $id, $hash, $auid)
             'version' => '1.3',
             'id' => $id,
             'hash' => $hash));
-          $dublgis = json_decode(file_get_contents($url.$uri));
+          $cp_json = file_get_contents($url.$uri);
+          $dublgis = json_decode($cp_json);
           $url = 'http://catalog.api.2gis.ru/geo/search?';
           $uri = http_build_query(array(
             'key' => $conf['2gis']['key'],
             'version' => '1.3',
             'q' => $dublgis->lon.','.$dublgis->lat));
-          $geoData = json_decode(file_get_contents($url.$uri));
+          $gd_json = file_get_contents($url.$uri);
+          $geoData = json_decode($gd_json);
           $companyName = pg_escape_string($dublgis->name);
           $query = "insert into log (uid, client, ip, text, domain) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}', '{$domain}') returning id";
           $result = pg_query($query);
           $logId = pg_fetch_result($result, 0, 'id');
-          $cp = pg_escape_string($dublgis);
-          $gd = pg_escape_string($geoData);
+          $cp = pg_escape_string($cp_json);
+          $gd = pg_escape_string($gd_json);
           $query = "insert into cache (logId, companyProfile, geoData) values ({$logId}, '{$cp}', '{$gd}')";
           pg_query($query);
           $json_return = array(
@@ -1006,7 +1012,6 @@ function getCompanyProfile_dev($api, $domain, $id, $hash, $auid)
             $cp = pg_escape_string($cp_json);
             $gd = pg_escape_string($gd_json);
             $query = "insert into cache (logId, companyProfile, geoData) values ({$logId}, '{$cp}', '{$gd}')";
-            die($query);
             pg_query($query);
             $json_return = array(
               'error' => '0',

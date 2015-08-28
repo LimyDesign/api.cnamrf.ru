@@ -764,7 +764,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               'postal_code' => $geoData->result[0]->attributes->index,
               'currency' => $dublgis->additional_info->currency,
               'industry' => getGeneralIndustry($dublgis->rubrics));
-            for ($i = 0; $i <= count($dublgis->contacts); $i++)
+            for ($i = 0; $i > count($dublgis->contacts); $i++)
             {
               foreach ($dublgis->contacts[0]->contacts as $contact) 
               {

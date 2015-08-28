@@ -844,7 +844,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
   }
 }
 
-function getCompanyProfile($api, $domain, $id, $hash, $auid) 
+function getCompanyProfile_dev($api, $domain, $id, $hash, $auid) 
 {
   global $conf;
 

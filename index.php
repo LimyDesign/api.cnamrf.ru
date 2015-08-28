@@ -616,7 +616,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
           $logId = pg_fetch_result($result, 0, 'id');
           $cp = pg_escape_string($dublgis);
           $gd = pg_escape_string($geoData);
-          $query = "insert info cache (logId, companyProfile, geoData) values ({$logId}, '{$cp}', '{$gd}')";
+          $query = "insert into cache (logId, companyProfile, geoData) values ({$logId}, '{$cp}', '{$gd}')";
           pg_query($query);
           $json_return = array(
             'error' => '0',

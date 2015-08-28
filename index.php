@@ -643,7 +643,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
             'postal_code' => $geoData->result[0]->attributes->index,
             'currency' => $dublgis->additional_info->currency,
             'industry' => getGeneralIndustry($dublgis->rubrics));
-          for ($i = 0; $i <= count($dublgis->contacts); $i++)
+          for ($i = 0; $i < count($dublgis->contacts); $i++)
           {
             foreach ($dublgis->contacts[$i]->contacts as $contact) 
             {
@@ -764,51 +764,55 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               'postal_code' => $geoData->result[0]->attributes->index,
               'currency' => $dublgis->additional_info->currency,
               'industry' => getGeneralIndustry($dublgis->rubrics));
-            foreach ($dublgis->contacts[0]->contacts as $contact) {
-              if ($contact->type == 'phone') {
-                $json_return['phone'][] = array(
-                  "VALUE" => $contact->value, 
-                  "VALUE_TYPE" => "WORK");
-              } elseif ($contact->type == 'fax') {
-                $json_return['phone'][] = array(
-                  "VALUE" => $contact->value,
-                  "VALUE_TYPE" => "FAX");
-              } elseif ($contact->type == 'email') {
-                $json_return['email'][] = array(
-                  "VALUE" => $contact->value,
-                  "VALUE_TYPE" => "WORK");
-              } elseif ($contact->type == 'website') {
-                $json_return['web'][] = array(
-                  "VALUE" => 'http://'.$contact->alias,
-                  "VALUE_TYPE" => "WORK");
-              } elseif ($contact->type == 'facebook') {
-                $json_return['web'][] = array(
-                  "VALUE" => $contact->value,
-                  "VALUE_TYPE" => "FACEBOOK");
-              } elseif ($contact->type == 'twitter') {
-                $json_return['web'][] = array(
-                  "VALUE" => $contact->value,
-                  "VALUE_TYPE" => "TWITTER");
-              } elseif ($contact->type == 'vkontakte') {
-                $json_return['web'][] = array(
-                  "VALUE" => $contact->value,
-                  "VALUE_TYPE" => "OTHER");
-              } elseif ($contact->type == 'vkontakte') {
-                $json_return['web'][] = array(
-                  "VALUE" => $contact->value,
-                  "VALUE_TYPE" => "OTHER");
-              } elseif ($contact->type == 'skype') {
-                $json_return['im'][] = array(
-                  "VALUE" => $contact->value,
-                  "VALUE_TYPE" => "SKYPE");
-              } elseif ($contact->type == 'icq') {
-                $json_return['im'][] = array(
-                  "VALUE" => $contact->value,
-                  "VALUE_TYPE" => "ICQ");
-              } elseif ($contact->type == 'jabber') {
-                $json_return['im'][] = array(
-                  "VALUE" => $contact->value,
-                  "VALUE_TYPE" => "JABBER");
+            for ($i = 0; $i < count($dublgis->contacts); $i++)
+            {
+              foreach ($dublgis->contacts[0]->contacts as $contact) 
+              {
+                if ($contact->type == 'phone') {
+                  $json_return['phone'][] = array(
+                    "VALUE" => $contact->value, 
+                    "VALUE_TYPE" => "WORK");
+                } elseif ($contact->type == 'fax') {
+                  $json_return['phone'][] = array(
+                    "VALUE" => $contact->value,
+                    "VALUE_TYPE" => "FAX");
+                } elseif ($contact->type == 'email') {
+                  $json_return['email'][] = array(
+                    "VALUE" => $contact->value,
+                    "VALUE_TYPE" => "WORK");
+                } elseif ($contact->type == 'website') {
+                  $json_return['web'][] = array(
+                    "VALUE" => 'http://'.$contact->alias,
+                    "VALUE_TYPE" => "WORK");
+                } elseif ($contact->type == 'facebook') {
+                  $json_return['web'][] = array(
+                    "VALUE" => $contact->value,
+                    "VALUE_TYPE" => "FACEBOOK");
+                } elseif ($contact->type == 'twitter') {
+                  $json_return['web'][] = array(
+                    "VALUE" => $contact->value,
+                    "VALUE_TYPE" => "TWITTER");
+                } elseif ($contact->type == 'vkontakte') {
+                  $json_return['web'][] = array(
+                    "VALUE" => $contact->value,
+                    "VALUE_TYPE" => "OTHER");
+                } elseif ($contact->type == 'vkontakte') {
+                  $json_return['web'][] = array(
+                    "VALUE" => $contact->value,
+                    "VALUE_TYPE" => "OTHER");
+                } elseif ($contact->type == 'skype') {
+                  $json_return['im'][] = array(
+                    "VALUE" => $contact->value,
+                    "VALUE_TYPE" => "SKYPE");
+                } elseif ($contact->type == 'icq') {
+                  $json_return['im'][] = array(
+                    "VALUE" => $contact->value,
+                    "VALUE_TYPE" => "ICQ");
+                } elseif ($contact->type == 'jabber') {
+                  $json_return['im'][] = array(
+                    "VALUE" => $contact->value,
+                    "VALUE_TYPE" => "JABBER");
+                }
               }
             }
             if (count($dublgis->rubrics)) {

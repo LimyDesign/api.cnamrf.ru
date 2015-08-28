@@ -602,8 +602,19 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
       $qty = pg_fetch_result($result, 0, 'qty');
       $price = pg_fetch_result($result, 0, 'price');
       pg_free_result($result);
-      if ($uid) {
-        if ($qty) {
+      if ($uid) 
+      {
+        $phones_masks = json_decode(file_get_contents(__DIR__.'/../js/phones-ru.json'));
+        for ($i = 0; $i < count($phones_masks); $i++) {
+          $pattern = "/\((\d{4})\)|\((\d{5})\)/";
+          preg_match($pattern, $phones_masks[$i]->mask, $mask[$i]);
+          unset($mask[$i][0]);
+        }
+        rsort($mask, SORT_NUMERIC);
+        unset($phones_masks);
+
+        if ($qty) 
+        {
           $query = "update users set qty = qty - 1 where id = {$uid}";
           pg_query($query);
           $url = 'http://catalog.api.2gis.ru/profile?';
@@ -643,17 +654,51 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
             'postal_code' => $geoData->result[0]->attributes->index,
             'currency' => $dublgis->additional_info->currency,
             'industry' => getGeneralIndustry($dublgis->rubrics));
-          for ($i = 0; $i > count($dublgis->contacts); $i++)
+          for ($i = 0; $i < count($dublgis->contacts); $i++)
           {
             foreach ($dublgis->contacts[$i]->contacts as $contact) 
             {
               if ($contact->type == 'phone') {
+                for ($x = 0; $x < count($mask); $x++)
+                {
+                  if (substr($contact->value, 1, 5) == $mask[$x][2])
+                  {
+                    $phone = '+7 (' . $mask[$x][2] . ') ' . substr($contact->value, 6, 1) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    break;
+                  }
+                  elseif (substr($contact->value, 1, 4) == $mask[$x][1])
+                  {
+                    $phone = '+7 (' . $mask[$x][1] . ') ' . substr($contact->value, 5, 2) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    break;
+                  }
+                  else
+                  {
+                    $phone = '+7 (' . substr($contact->value, 1, 3) . ') ' . substr($contact->value, 4, 3) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                  }
+                }
                 $json_return['phone'][] = array(
-                  "VALUE" => $contact->value, 
+                  "VALUE" => $phone, 
                   "VALUE_TYPE" => "WORK");
               } elseif ($contact->type == 'fax') {
+                for ($x = 0; $x < count($mask); $x++)
+                {
+                  if (substr($contact->value, 1, 5) == $mask[$x][2])
+                  {
+                    $phone = '+7 (' . $mask[$x][2] . ') ' . substr($contact->value, 6, 1) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    break;
+                  }
+                  elseif (substr($contact->value, 1, 4) == $mask[$x][1])
+                  {
+                    $phone = '+7 (' . $mask[$x][1] . ') ' . substr($contact->value, 5, 2) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    break;
+                  }
+                  else
+                  {
+                    $phone = '+7 (' . substr($contact->value, 1, 3) . ') ' . substr($contact->value, 4, 3) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                  }
+                }
                 $json_return['phone'][] = array(
-                  "VALUE" => $contact->value,
+                  "VALUE" => $phone,
                   "VALUE_TYPE" => "FAX");
               } elseif ($contact->type == 'email') {
                 $json_return['email'][] = array(
@@ -763,7 +808,6 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               'region' => $geoData->result[0]->attributes->district,
               'postal_code' => $geoData->result[0]->attributes->index,
               'currency' => $dublgis->additional_info->currency,
-              'count_contacts' => count($dublgis->contacts),
               'industry' => getGeneralIndustry($dublgis->rubrics));
             for ($i = 0; $i < count($dublgis->contacts); $i++)
             {

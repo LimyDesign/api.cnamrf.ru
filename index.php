@@ -627,7 +627,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
           $logId = pg_fetch_result($result, 0, 'id');
           $cp = pg_escape_string($cp_json);
           $gd = pg_escape_string($gd_json);
-          $query = "insert into \"public\".\"cache\" (\"logid\", \"companyProfile\", \"geoData\") values ({$logId}, '{$cp}', '{$gd}')";
+          $query = "insert into cnam_cache (logid, companyProfile, geoData) values ({$logId}, '{$cp}', '{$gd}')";
           pg_query($query);
           $json_return = array(
             'error' => '0',
@@ -744,7 +744,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
             $logId = pg_fetch_result($result, 0, 'id');
             $cp = pg_escape_string($cp_json);
             $gd = pg_escape_string($gd_json);
-            $query = "insert into \"public\".\"cache\" (\"logid\", \"companyProfile\", \"geoData\") values ({$logId}, '{$cp}', '{$gd}')";
+            $query = "insert into cnam_cache (logid, companyProfile, geoData) values ({$logId}, '{$cp}', '{$gd}')";
             pg_query($query);
             $json_return = array(
               'error' => '0',

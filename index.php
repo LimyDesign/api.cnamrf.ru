@@ -765,7 +765,9 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               $json_return['comments'] .= $additional_info_service_price;
             }
           }
-        } else {
+        } 
+        else 
+        {
           $query = "select (sum(debet) - sum(credit)) as balans from log where uid = {$uid}";
           $result = pg_query($query);
           $balans = pg_fetch_result($result, 0, 'balans');
@@ -814,12 +816,46 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               foreach ($dublgis->contacts[$i]->contacts as $contact) 
               {
                 if ($contact->type == 'phone') {
+                  for ($x = 0; $x < count($mask); $x++)
+                  {
+                    if (substr($contact->value, 1, 5) == $mask[$x][2])
+                    {
+                      $phone = '+7 (' . $mask[$x][2] . ') ' . substr($contact->value, 6, 1) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                      break;
+                    }
+                    elseif (substr($contact->value, 1, 4) == $mask[$x][1])
+                    {
+                      $phone = '+7 (' . $mask[$x][1] . ') ' . substr($contact->value, 5, 2) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                      break;
+                    }
+                    else
+                    {
+                      $phone = '+7 (' . substr($contact->value, 1, 3) . ') ' . substr($contact->value, 4, 3) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    }
+                  }
                   $json_return['phone'][] = array(
-                    "VALUE" => $contact->value, 
+                    "VALUE" => $phone, 
                     "VALUE_TYPE" => "WORK");
                 } elseif ($contact->type == 'fax') {
+                  for ($x = 0; $x < count($mask); $x++)
+                  {
+                    if (substr($contact->value, 1, 5) == $mask[$x][2])
+                    {
+                      $phone = '+7 (' . $mask[$x][2] . ') ' . substr($contact->value, 6, 1) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                      break;
+                    }
+                    elseif (substr($contact->value, 1, 4) == $mask[$x][1])
+                    {
+                      $phone = '+7 (' . $mask[$x][1] . ') ' . substr($contact->value, 5, 2) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                      break;
+                    }
+                    else
+                    {
+                      $phone = '+7 (' . substr($contact->value, 1, 3) . ') ' . substr($contact->value, 4, 3) . '-' . substr($contact->value, 7, 2) . '-' . substr($contact->value, 9, 2);
+                    }
+                  }
                   $json_return['phone'][] = array(
-                    "VALUE" => $contact->value,
+                    "VALUE" => $phone,
                     "VALUE_TYPE" => "FAX");
                 } elseif ($contact->type == 'email') {
                   $json_return['email'][] = array(

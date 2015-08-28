@@ -818,6 +818,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               foreach ($dublgis->contacts[$i]->contacts as $contact) 
               {
                 if ($contact->type == 'phone') {
+                  $phone = $contact->value;
                   for ($x = 0; $x < count($mask); $x++)
                   {
                     if (substr($contact->value, 1, 5) == $mask[$x][2])
@@ -839,6 +840,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
                     "VALUE" => $phone, 
                     "VALUE_TYPE" => "WORK");
                 } elseif ($contact->type == 'fax') {
+                  $phone = $contact->value;
                   for ($x = 0; $x < count($mask); $x++)
                   {
                     if (substr($contact->value, 1, 5) == $mask[$x][2])

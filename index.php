@@ -611,7 +611,10 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
             'q' => $dublgis->lon.','.$dublgis->lat));
           $geoData = json_decode(file_get_contents($url.$uri));
           $companyName = pg_escape_string($dublgis->name);
-          $query = "insert into log (uid, client, ip, text, domain) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}', '{$domain}')";
+          $query = "insert into log (uid, client, ip, text, domain) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}', '{$domain}') returning id";
+          $result = pg_query($query);
+          $logId = pg_fetch_result($result, 0, 'id');
+          $query = "insert info cache (logId, companyProfile, geoData) values ({$logId}, '{$dublgis}', '{$geoData}')";
           pg_query($query);
           $json_return = array(
             'error' => '0',

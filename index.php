@@ -767,7 +767,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               'industry' => getGeneralIndustry($dublgis->rubrics));
             for ($i = 0; $i < count($dublgis->contacts); $i++)
             {
-              foreach ($dublgis->contacts[0]->contacts as $contact) 
+              foreach ($dublgis->contacts[$i]->contacts as $contact) 
               {
                 if ($contact->type == 'phone') {
                   $json_return['phone'][] = array(

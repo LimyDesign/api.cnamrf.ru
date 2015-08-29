@@ -633,7 +633,9 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
             pg_query($query);
           }
           $dublgis = json_decode($cp_json);
-          $query = "select json from geodata where lon = '{$dublgis->lon}' and lat = '{$dublgis->lat}'";
+          $lon = $dublgis->lon;
+          $lat = $dublgis->lat;
+          $query = "select json from geodata where lon = '{$lon}' and lat = '{$lat}'";
           $result = pg_query($query);
           $gd_json = pg_fetch_result($result, 0, 'json');
           if (!$gd_json) {
@@ -644,7 +646,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               'q' => $dublgis->lon.','.$dublgis->lat));
             $gd_json = file_get_contents($url.$uri);
             $gd = pg_escape_string($gd_json);
-            $query = "insert into geodata (log, lat, json) values ('{$dublgis->lon}', '{$dublgis->lat}', '{$gd}')";
+            $query = "insert into geodata (log, lat, json) values ('{$lon}', '{$lat}', '{$gd}')";
             pg_query($query);
           }
           $geoData = json_decode($gd_json);
@@ -652,7 +654,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
           $query = "insert into log (uid, client, ip, text, domain) values ({$uid}, '{$uClient}', $uCIP, '{$companyName}', '{$domain}') returning id";
           $result = pg_query($query);
           $logId = pg_fetch_result($result, 0, 'id');
-          $query = "insert into cnam_cache (logid, cp_id, cp_hash, lon, lat) values ({$logId}, '{$id}', '{$hash}', '{$dublgis->lon}', '{$dublgis->lat}')";
+          $query = "insert into cnam_cache (logid, cp_id, cp_hash, lon, lat) values ({$logId}, '{$id}', '{$hash}', '{$lon}', '{$lat}')";
           pg_query($query);
           $json_return = getCompanyProfileArray($auid, $dublgis, $geoData);
         } 
@@ -679,7 +681,9 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               pg_query($query);
             }
             $dublgis = json_decode($cp_json);
-            $query = "select json from geodata where lon = '{$dublgis->lon}' and lat = '{$dublgis->lat}'";
+            $lon = $dublgis->lon;
+            $lat = $dublgis->lat;
+            $query = "select json from geodata where lon = '{$lon}' and lat = '{$lat}'";
             $result = pg_query($query);
             $gd_json = pg_fetch_result($result, 0, 'json');
             if (!$gd_json) {
@@ -690,7 +694,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
                 'q' => $dublgis->lon.','.$dublgis->lat));
               $gd_json = file_get_contents($url.$uri);
               $gd = pg_escape_string($gd_json);
-              $query = "insert into geodata (log, lat, json) values ('{$dublgis->lon}', '{$dublgis->lat}', '{$gd}')";
+              $query = "insert into geodata (log, lat, json) values ('{$lon}', '{$lat}', '{$gd}')";
               pg_query($query);
             }
             $geoData = json_decode($gd_json);
@@ -698,7 +702,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
             $query = "insert into log (uid, credit, client, ip, text, domain) values ({$uid}, '{$price}', '{$uClient}', $uCIP, '{$companyName}', '{$domain}') returning id";
             $result = pg_query($query);
             $logId = pg_fetch_result($result, 0, 'id');
-            $query = "insert into cnam_cache (logid, cp_id, cp_hash, lon, lat) values ({$logId}, '{$id}', '{$hash}', '{$dublgis->lon}', '{$dublgis->lat}')";
+            $query = "insert into cnam_cache (logid, cp_id, cp_hash, lon, lat) values ({$logId}, '{$id}', '{$hash}', '{$lon}', '{$lat}')";
             pg_query($query);
             $json_return = getCompanyProfileArray($auid, $dublgis, $geoData);
           } else {

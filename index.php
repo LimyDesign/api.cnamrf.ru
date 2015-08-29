@@ -617,7 +617,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
         {
           $query = "update users set qty = qty - 1 where id = {$uid}";
           pg_query($query);
-          $query = "select json from companyprofile where id = {$id} and hash = '{$hash}'";
+          $query = "select json from cnam_cp where id = {$id} and hash = '{$hash}'";
           $result = pg_query($query);
           $cp_json = pg_fetch_result($result, 0, 'json');
           if (!$cp_json) {
@@ -629,7 +629,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
               'hash' => $hash));
             $cp_json = file_get_contents($url.$uri);
             $cp = pg_escape_string($cp_json);
-            $query = "insert into companyprofile (id, hash, json) values ({$id}, '{$hash}', '{$cp}')";
+            $query = "insert into cnam_cp (id, hash, json) values ({$id}, '{$hash}', '{$cp}')";
             pg_query($query);
           }
           $dublgis = json_decode($cp_json);
@@ -663,7 +663,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
           $balans = pg_fetch_result($result, 0, 'balans');
           if ($balans >= $price) 
           {
-            $query = "select json from companyprofile where id = {$id} and hash = '{$hash}'";
+            $query = "select json from cnam_cp where id = {$id} and hash = '{$hash}'";
             $result = pg_query($query);
             $cp_json = pg_fetch_result($result, 0, 'json');
             if (!$cp_json) {
@@ -675,7 +675,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
                 'hash' => $hash));
               $cp_json = file_get_contents($url.$uri);
               $cp = pg_escape_string($cp_json);
-              $query = "insert into companyprofile (id, hash, json) values ({$id}, '{$hash}', '{$cp}')";
+              $query = "insert into cnam_cp (id, hash, json) values ({$id}, '{$hash}', '{$cp}')";
               pg_query($query);
             }
             $dublgis = json_decode($cp_json);

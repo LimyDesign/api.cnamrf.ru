@@ -575,20 +575,31 @@ function getCompanyListByRubric($apikey, $rubric, $city, $domain, $pageNum)
  * развернутую информацию о компании для инморта 
  * в справочник CRM системы
  * 
- * @param  string $api    Ключ доступа выдаваемый пользователю при регистрации
- * @param  string $domain Домен с которого происходит обращение
- * @param  string $id     Уникальный идентификатор филиала 2ГИС
- * @param  string $hash   Уникальный хэш филиала выдаваемый 2ГИС
- * @return string         Массив данных в JSON-формате
+ * @param  string  $api         Ключ доступа выдаваемый пользователю при регистрации
+ * @param  string  $domain      Домен с которого происходит обращение
+ * @param  integer $id          Уникальный идентификатор филиала 2ГИС
+ * @param  string  $hash        Уникальный хэш филиала выдаваемый 2ГИС
+ * @param  integer $auid        Идентификатор пользователя, который назначен ответственным в Б24
+ * @param  string  $ip          IP-адрес пользователя системой
+ * @param  booling $getFrom2GIS Указывает на необходимость получения данных из 2ГИС, 
+ *                              а не из локального справочника
+ * @return string               Массив данных в JSON-формате
  */
-function getCompanyProfile($api, $domain, $id, $hash, $auid) 
-{
+function getCompanyProfile
+(
+  $api, 
+  $domain, 
+  $id, 
+  $hash, 
+  $auid, 
+  $ip = '127.0.0.1', 
+  $getFrom2GIS = false
+) {
   global $conf;
 
   $apikey = preg_replace('/[^a-z0-9]/', '', $_REQUEST['apikey']);
   $uClient = 'Lead4CRM';
-  // $uCIP = sprintf("%u", ip2long(gethostbyname($domain)));
-  $uCIP = sprintf("%u", ip2long('127.0.0.1'));
+  $uCIP = sprintf("%u", ip2long($ip));
   
   if ($apikey && $hash && is_numeric($id)) {
     if ($conf['db']['type'] == 'postgres')
@@ -620,7 +631,7 @@ function getCompanyProfile($api, $domain, $id, $hash, $auid)
           $query = "select json from cnam_cp where id = {$id} and hash = '{$hash}'";
           $result = pg_query($query);
           $cp_json = pg_fetch_result($result, 0, 'json');
-          if (!$cp_json) {
+          if (!$cp_json || $getFrom2GIS) {
             $url = 'http://catalog.api.2gis.ru/profile?';
             $uri = http_build_query(array(
               'key' => $conf['2gis']['key'],
@@ -809,10 +820,6 @@ function getCompanyProfileArray($auid, $dublgis, $geoData)
         $json_return['web'][] = array(
           "VALUE" => $contact->value,
           "VALUE_TYPE" => "TWITTER");
-      } elseif ($contact->type == 'vkontakte') {
-        $json_return['web'][] = array(
-          "VALUE" => $contact->value,
-          "VALUE_TYPE" => "OTHER");
       } elseif ($contact->type == 'vkontakte') {
         $json_return['web'][] = array(
           "VALUE" => $contact->value,

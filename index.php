@@ -670,10 +670,10 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
           $balans = pg_fetch_result($result, 0, 'balans');
           if ($balans >= $price) 
           {
-            $query = "select json from cnam_cp where id = {$id} and hash = '{$hash}'";
+            $query = "select json from cnam_cp where id = {$id}";
             $result = pg_query($query);
             $cp_json = pg_fetch_result($result, 0, 'json');
-            if (!$cp_json) {
+            if (!$cp_json || $getFrom2GIS) {
               $url = 'http://catalog.api.2gis.ru/profile?';
               $uri = http_build_query(array(
                 'key' => $conf['2gis']['key'],
@@ -709,7 +709,7 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
             $logId = pg_fetch_result($result, 0, 'id');
             $query = "insert into cnam_cache (logid, cp_id, cp_hash, lon, lat) values ({$logId}, '{$id}', '{$hash}', '{$lon}', '{$lat}')";
             pg_query($query);
-            $json_return = getCompanyProfileArray($auid, $dublgis, $geoData);
+            $json_return = getCompanyProfileArray($auid, $dublgis, $geoData, $getFrom2GIS);
           } else {
             $json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите https://www.lead4crm.ru и пополните баланс любым удобным способом.');
           }

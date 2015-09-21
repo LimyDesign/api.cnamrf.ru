@@ -628,7 +628,7 @@ function getCompanyProfile
         {
           $query = "update users set qty = qty - 1 where id = {$uid}";
           pg_query($query);
-          $query = "select json from cnam_cp where id = {$id} and hash = '{$hash}'";
+          $query = "select json from cnam_cp where id = {$id}";
           $result = pg_query($query);
           $cp_json = pg_fetch_result($result, 0, 'json');
           if (!$cp_json || $getFrom2GIS) {

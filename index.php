@@ -75,7 +75,9 @@ switch ($cmd[0]) {
       $_REQUEST['domain'],
       $_REQUEST['id'],
       $_REQUEST['hash'],
-      $_REQUEST['auid']);
+      $_REQUEST['auid'],
+      $_REQUEST['ip'],
+      $_REQUEST['2gis']);
     break;
 
   case 'getCompanyProfile_dev':
@@ -585,16 +587,8 @@ function getCompanyListByRubric($apikey, $rubric, $city, $domain, $pageNum)
  *                              а не из локального справочника
  * @return string               Массив данных в JSON-формате
  */
-function getCompanyProfile
-(
-  $api, 
-  $domain, 
-  $id, 
-  $hash, 
-  $auid, 
-  $ip = '127.0.0.1', 
-  $getFrom2GIS = false
-) {
+function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS) 
+{
   global $conf;
 
   $apikey = preg_replace('/[^a-z0-9]/', '', $_REQUEST['apikey']);

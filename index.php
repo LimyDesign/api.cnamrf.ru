@@ -661,7 +661,7 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
           $logId = pg_fetch_result($result, 0, 'id');
           $query = "insert into cnam_cache (logid, cp_id, cp_hash, lon, lat) values ({$logId}, '{$id}', '{$hash}', '{$lon}', '{$lat}')";
           pg_query($query);
-          $json_return = getCompanyProfileArray($auid, $dublgis, $geoData);
+          $json_return = getCompanyProfileArray($auid, $dublgis, $geoData, $getFrom2GIS);
         } 
         else 
         {
@@ -732,10 +732,11 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
  * @param  object  $geoData Объект содержащий ответ API сервера 2ГИС с гео-данными
  * @return array            Массив данных карточки компании для Б24
  */
-function getCompanyProfileArray($auid, $dublgis, $geoData)
+function getCompanyProfileArray($auid, $dublgis, $geoData, $getFrom2GIS = false)
 {
   $json_return = array(
     'error' => '0',
+    'getFrom2GIS' => $getFrom2GIS,
     'auid' => $auid,
     'id' => $dublgis->id,
     'log' => $dublgis->lon,

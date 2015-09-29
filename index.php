@@ -699,7 +699,7 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
                 'q' => $dublgis->lon.','.$dublgis->lat));
               $gd_json = file_get_contents($url.$uri);
               $gd = pg_escape_string($gd_json);
-              $query = "insert into geodata (log, lat, json) values ('{$lon}', '{$lat}', '{$gd}')";
+              $query = "insert into geodata (lon, lat, json) values ('{$lon}', '{$lat}', '{$gd}')";
               $sql = $query;
               pg_query($query);
             }

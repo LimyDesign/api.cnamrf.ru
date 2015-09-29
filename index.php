@@ -684,6 +684,7 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
               $cp_json = file_get_contents($url.$uri);
               $cp = pg_escape_string($cp_json);
               $query = "insert into cnam_cp (id, hash, json) values ({$id}, '{$hash}', '{$cp}')";
+              file_put_contents('tmp.sql', $query);
               pg_query($query);
             }
             $dublgis = json_decode($cp_json);

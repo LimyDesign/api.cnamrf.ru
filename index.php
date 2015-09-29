@@ -635,7 +635,6 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
             $cp_json = file_get_contents($url.$uri);
             $cp = pg_escape_string($cp_json);
             $query = "insert into cnam_cp (id, hash, json) values ({$id}, '{$hash}', '{$cp}')";
-            $sql = $query;
             pg_query($query);
           }
           $dublgis = json_decode($cp_json);
@@ -684,7 +683,6 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
               $cp_json = file_get_contents($url.$uri);
               $cp = pg_escape_string($cp_json);
               $query = "insert into cnam_cp (id, hash, json) values ({$id}, '{$hash}', '{$cp}')";
-              $sql = $query;
               pg_query($query);
             }
             $dublgis = json_decode($cp_json);
@@ -693,7 +691,7 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
             $query = "select json from geodata where lon = '{$lon}' and lat = '{$lat}'";
             $result = pg_query($query);
             $gd_json = pg_fetch_result($result, 0, 'json');
-            if (!$gd_json) {
+            if (empty($gd_json)) {
               $url = 'http://catalog.api.2gis.ru/geo/search?';
               $uri = http_build_query(array(
                 'key' => $conf['2gis']['key'],
@@ -702,6 +700,7 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
               $gd_json = file_get_contents($url.$uri);
               $gd = pg_escape_string($gd_json);
               $query = "insert into geodata (log, lat, json) values ('{$lon}', '{$lat}', '{$gd}')";
+              $sql = $query;
               pg_query($query);
             }
             $geoData = json_decode($gd_json);
@@ -711,7 +710,6 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
             $logId = pg_fetch_result($result, 0, 'id');
             $query = "insert into cnam_cache (logid, cp_id, cp_hash, lon, lat) values ({$logId}, '{$id}', '{$hash}', '{$lon}', '{$lat}')";
             pg_query($query);
-            $sql = $query;
             $json_return = getCompanyProfileArray($auid, $dublgis, $geoData, $sql);
           } else {
             $json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите https://www.lead4crm.ru и пополните баланс любым удобным способом.');
@@ -735,7 +733,7 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
  * @param  object  $geoData Объект содержащий ответ API сервера 2ГИС с гео-данными
  * @return array            Массив данных карточки компании для Б24
  */
-function getCompanyProfileArray($auid, $dublgis, $geoData, $sql)
+function getCompanyProfileArray($auid, $dublgis, $geoData, $sql = null)
 {
   $json_return = array(
     'error' => '0',

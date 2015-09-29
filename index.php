@@ -711,6 +711,7 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
             $logId = pg_fetch_result($result, 0, 'id');
             $query = "insert into cnam_cache (logid, cp_id, cp_hash, lon, lat) values ({$logId}, '{$id}', '{$hash}', '{$lon}', '{$lat}')";
             pg_query($query);
+            $sql = $query;
             $json_return = getCompanyProfileArray($auid, $dublgis, $geoData, $sql);
           } else {
             $json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите https://www.lead4crm.ru и пополните баланс любым удобным способом.');

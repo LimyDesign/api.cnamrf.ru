@@ -80,15 +80,6 @@ switch ($cmd[0]) {
       $_REQUEST['2gis']);
     break;
 
-  case 'getCompanyProfile_dev':
-    echo getCompanyProfile_dev(
-      $_REQUEST['apikey'],
-      $_REQUEST['domain'],
-      $_REQUEST['id'],
-      $_REQUEST['hash'],
-      $_REQUEST['auid']);
-    break;
-
   case 'sendEmail':
     header("Access-Control-Allow-Origin: *");
     echo sendEmail(
@@ -661,7 +652,7 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
           $logId = pg_fetch_result($result, 0, 'id');
           $query = "insert into cnam_cache (logid, cp_id, cp_hash, lon, lat) values ({$logId}, '{$id}', '{$hash}', '{$lon}', '{$lat}')";
           pg_query($query);
-          $json_return = getCompanyProfileArray($auid, $dublgis, $geoData, $sql);
+          $json_return = getCompanyProfileArray($auid, $dublgis, $geoData);
         } 
         else 
         {
@@ -709,7 +700,7 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
             $logId = pg_fetch_result($result, 0, 'id');
             $query = "insert into cnam_cache (logid, cp_id, cp_hash, lon, lat) values ({$logId}, '{$id}', '{$hash}', '{$lon}', '{$lat}')";
             pg_query($query);
-            $json_return = getCompanyProfileArray($auid, $dublgis, $geoData, $sql);
+            $json_return = getCompanyProfileArray($auid, $dublgis, $geoData, $price);
           } else {
             $json_return = array('error' => '5', 'message' => 'Не достаточно средств. Посетите https://www.lead4crm.ru и пополните баланс любым удобным способом.');
           }
@@ -732,11 +723,11 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
  * @param  object  $geoData Объект содержащий ответ API сервера 2ГИС с гео-данными
  * @return array            Массив данных карточки компании для Б24
  */
-function getCompanyProfileArray($auid, $dublgis, $geoData, $sql = null)
+function getCompanyProfileArray($auid, $dublgis, $geoData, $summ = null)
 {
   $json_return = array(
     'error' => '0',
-    'sql' => $sql,
+    'summ' => $summ,
     'auid' => $auid,
     'id' => $dublgis->id,
     'log' => $dublgis->lon,

@@ -13,7 +13,7 @@ if (empty($options)) {
 	echo "\tphp ".__DIR__."/cron.php -b\n";
 	exit();
 } elseif (isset($options['b'])) {
-	$date = date('Y-m-d');
+	$date = date('Y-m-d H:i:s');
 	echo $date." Выполняем проверку на продление тарифов...\n";
 }
 ?>

@@ -1,4 +1,5 @@
 <?php
+namespace ArsenBespalov;
 
 interface StaffErrorsMsg
 {

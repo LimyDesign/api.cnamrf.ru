@@ -1,6 +1,12 @@
 <?php
+
+spl_autoload_register(function ($class) {
+	include 'src/'.$class.'.class.php';
+});
+
+use \ArsenBespalov\Staff;
+
 $conf = json_decode(file_get_contents(__DIR__.'/config.json'), true);
-include_once __DIR__.'/src/Staff.php';
 
 $options = getopt("hb");
 if (empty($options)) {

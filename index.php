@@ -339,7 +339,7 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum)
       $query = "select name from cities where id = {$city}";
       $result = pg_query($query);
       $cityName = pg_fetch_result($result, 0, 'name');
-      $query = "select users.id, users.qty + trunc((select sum(debet) - sum(credit) from log where uid = (select id from users where apikey = '{$apikey}')) / tariff.price) as qty, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";
+      $query = "select t1.id, t1.qty2 + trunc((select sum(t3.debet) - sum(t3.credit) from log t3 where t3.uid = t1.id) / t2.price) as qty, tariff.price from users t1 left join tariff t2 on t1.tariffid2 = t2.id where apikey = '{$apikey}'";
       $result = pg_query($query);
       $uid = pg_fetch_result($result, 0, 'id');
       $qty = pg_fetch_result($result, 0, 'qty');
@@ -347,8 +347,6 @@ function getCompanyList($apikey, $text, $city, $domain, $pageNum)
       pg_free_result($result);
       if ($uid) {
         if ($qty) {
-          // $query = "update users set qty = qty - 1 where id = {$uid}";
-          // pg_query($query);
           $text = pg_escape_string($text);
           $query = "insert into log (uid, client, ip, text, domain) values ({$uid}, '{$uClient}', {$uCIP}, '{$text}', '{$domain}')";
           pg_query($query);
@@ -470,7 +468,7 @@ function getCompanyListByRubric($apikey, $rubric, $city, $domain, $pageNum)
       $query = "select name from cities where id = {$city}";
       $result = pg_query($query);
       $cityName = pg_fetch_result($result, 0, 'name');
-      $query = "select users.id, users.qty + trunc((select sum(debet) - sum(credit) from log where uid = (select id from users where apikey = '{$apikey}')) / tariff.price) as qty, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";
+      $query = "select t1.id, t1.qty2 + trunc((select sum(t3.debet) - sum(t3.credit) from log t3 where t3.uid = t1.id) / t2.price) as qty, t2.price from users t1 left join tariff t2 on t1.tariffid2 = t2.id where apikey = '{$apikey}'";
       $result = pg_query($query);
       $uid = pg_fetch_result($result, 0, 'id');
       $qty = pg_fetch_result($result, 0, 'qty');
@@ -592,10 +590,10 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
       $db_err_message = array('error' => 100, 'message' => 'Не могу подключиться к базе данных. Пожалуйста, напишите сообщение об этой ошибке по адресу: support@lead4crm.ru.');
       $db = pg_connect('dbname='.$conf['db']['database']) or 
         die(json_encode($db_err_message));
-      $query = "select users.id, users.qty, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";
+      $query = "select users.id, users.qty2, tariff.price from users left join tariff on users.tariffid2 = tariff.id where apikey = '{$apikey}'";
       $result = pg_query($query);
       $uid = pg_fetch_result($result, 0, 'id');
-      $qty = pg_fetch_result($result, 0, 'qty');
+      $qty = pg_fetch_result($result, 0, 'qty2');
       $price = pg_fetch_result($result, 0, 'price');
       pg_free_result($result);
       if ($uid) 
@@ -611,7 +609,7 @@ function getCompanyProfile ($api, $domain, $id, $hash, $auid, $ip, $getFrom2GIS)
 
         if ($qty) 
         {
-          $query = "update users set qty = qty - 1 where id = {$uid}";
+          $query = "update users set qty2 = qty2 - 1 where id = {$uid}";
           pg_query($query);
           $query = "select json from cnam_cp where id = {$id}";
           $result = pg_query($query);
@@ -915,7 +913,7 @@ function defaultResult()
 /**
  * Функция получения данные либо из локальной базы данных,
  * либо из справочника 2ГИС. Это вспомогательная функция,
- * для получения и передачи данных пользователю используеются
+ * для получения и передачи данных пользователю используются
  * другие функции, например getName($number).
  * 
  * @param  integer  $number  Номер телефона в стандарте E.164

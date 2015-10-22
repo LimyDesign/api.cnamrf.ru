@@ -1,5 +1,5 @@
 <?php
-// $conf = json_decode(file_get_contents(__DIR__.'/config.json'), true);
+$conf = json_decode(file_get_contents(__DIR__.'/config.json'), true);
 require_once __DIR__.'/src/Staff.php';
 
 $options = getopt("hb");

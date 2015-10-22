@@ -8,7 +8,7 @@ if (empty($options)) {
 	echo "\tphp ".basename(__FILE__)." -h\n";
 	exit();
 } elseif (isset($options['h'])) {
-	echo "Специальный чарджер балансов клиентов Lead4CRM.\n";
+	echo "Специальный чарджер балансов клиентов CNAM РФ и Lead4CRM.\n";
 	echo "Для использования данного приложения необходимо в CRON\n";
 	echo "добавить следующую строку для ежедневного выполнения:\n";
 	echo "\tphp ".__DIR__."/cron.php -b\n";
@@ -37,7 +37,7 @@ function resultRenewal($staff, $mode = false) {
 				}
 			}
 		}
-		
+
 		if ($test) {
 			resultRenewal($staff, true);
 		}

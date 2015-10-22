@@ -15,22 +15,36 @@ if (empty($options)) {
 	exit();
 } elseif (isset($options['b'])) {
 	echo log_data()." Выполняем проверку на продление тарифов...\n";
-	$tariff = new Stuff($conf['db']['username'], $conf['db']['password'], $conf['db']['host'], $conf['db']['database'], $conf['db']['type']);
-	$result = $tariff->renewal();
+	$staff = new Stuff($conf['db']['username'], $conf['db']['password'], $conf['db']['host'], $conf['db']['database'], $conf['db']['type']);
+	echo resultRenewal($staff);
+}
+
+function resultRenewal($staff, $mode = false) {
+	$result = $staff->renewal($mode);
+	$test = 0;
+	$msg = array();
 	if (!empty($result)) {
-		echo log_data()." Обновление тарифов выполнено для следующих пользователей:\n";
+		$msg[] = log_data()." Обновление тарифов выполнено для следующих пользователей:\n";
 		foreach ($result as $userid => $details) {
 			foreach ($details as $data) {
 				if ($data['test'] === false) {
-					echo log_data()."\t У пользователя #".$userid." было снято ".$data['summ']." руб.\n";
+					$sum = 0;
+					if (isset($data['renew_sum_1'])) $sum += $data['renew_sum_1'];
+					if (isset($data['renew_sum_2'])) $sum += $data['renew_sum_2'];
+					$msg[] = log_data()."\t У пользователя #".$userid." было снято ".$sum." руб.\n";
 				} else {
-					
+					$test++;
 				}
 			}
 		}
+		
+		if ($test) {
+			resultRenewal($staff, true);
+		}
 	} else {
-		echo log_data()." Нет пользователей для обновления тарифов.\n";
+		$msg[] = log_data()." Нет пользователей для обновления тарифов.\n";
 	}
+	return implode('', $msg);
 }
 
 function log_data() {

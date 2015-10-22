@@ -54,7 +54,7 @@ class Staff implements StaffErrorsMsg
 		$db = $this->db;
 		if ($test) $add = "+ INTERVAL '1 week'";
 		else $add = "";
-		$query = "SELECT t1.uid, t1.modtime, t2.qty, t2.qty2, t2.tariffid, t2.tariffid2, t3.name AS cnam_name, t3.sum AS cnam_sum, t3.queries AS cnam_qty, t3.autosum AS cnam_renewal, t4.name AS crm_name, t4.sum AS crm_sum, t4.queries AS crm_qty, t4.autosum AS crm_renewal, t2.telegram_chat_id, t2.telegram_renewal, t2.icq_uin, t2.icq_renewal, (SELECT sum(debet) - sum(credit) FROM log t5 WHERE t1.uid = t5.uid) AS balans FROM log t1 LEFT JOIN users t2 ON t1.uid = t2.id LEFT JOIN tariff t3 ON t2.tariffid = t3.id LEFT JOIN tariff t4 ON t2.tariffid2 = t4.id WHERE t1.client ~ '^Активация тарифа.*' AND t1.uid != 33 AND date_trunc('day', t1.modtime) {$add} = date_trunc('day', LOCALTIMESTAMP) - INTERVAL '1 month' ORDER BY t1.modtime DESC;";
+		$query = "SELECT t1.uid, t1.modtime, t2.qty, t2.qty2, t2.tariffid, t2.tariffid2, t3.name AS cnam_name, t3.sum AS cnam_sum, t3.queries AS cnam_qty, t3.autosum AS cnam_renewal, t4.name AS crm_name, t4.sum AS crm_sum, t4.queries AS crm_qty, t4.autosum AS crm_renewal, t2.telegram_chat_id, t2.telegram_renewal, t2.icq_uin, t2.icq_renewal, (SELECT sum(debet) - sum(credit) FROM log t5 WHERE t1.uid = t5.uid) AS balans FROM log t1 LEFT JOIN users t2 ON t1.uid = t2.id LEFT JOIN tariff t3 ON t2.tariffid = t3.id LEFT JOIN tariff t4 ON t2.tariffid2 = t4.id WHERE t1.client ~ '^Активация тарифа.*' AND date_trunc('day', t1.modtime) {$add} = date_trunc('day', LOCALTIMESTAMP) - INTERVAL '1 month' ORDER BY t1.modtime DESC;";
 		try
 		{
 			$sth = $db->prepare($query);
@@ -85,7 +85,7 @@ class Staff implements StaffErrorsMsg
 					if ($test)
 					{
 						$result[$uid] = array(
-							'test' => true,
+							'test' => $test,
 							'date' => date('d.m.Y', strtotime($date)),
 							'cnam_qty' => $qty,
 							'crm_qty' => $qty2,
@@ -101,7 +101,7 @@ class Staff implements StaffErrorsMsg
 						$cnam['info'] = self::MSG_ACTIVATE_TARIFF.$cnam['name'];
 						$crm['info'] = self::MSG_ACTIVATE_TARIFF.$crm['name'];
 						$result[$uid] = array(
-							'test' => false,
+							'test' => $test,
 							'telegram' => $telegram,
 							'icq' => $icq
 						);

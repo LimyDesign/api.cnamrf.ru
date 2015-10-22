@@ -35,12 +35,6 @@ function resultRenewal($staff, $mode = false) {
 					$msg[] = log_data()."\t У пользователя #".$userid." было снято ".$sum." руб.\n";
 				}
 			}
-
-			if ($test) {
-				$msg[] = log_data()." Отправляем пользователям уведомления, если есть кому.\n";
-				$msg[] = log_data()." Переключаемся на проверку реальных обновлений.\n";
-				resultRenewal($staff, true);
-			}
 		} else {
 			$msg[] = log_data()." Нет пользователей для обновления тарифов.\n";
 		}

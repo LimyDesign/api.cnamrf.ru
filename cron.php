@@ -1,7 +1,7 @@
 <?php
 $conf = json_decode(file_get_contents(__DIR__.'/config.json'), true);
 require_once __DIR__.'/src/Staff.php';
-use Staff\Staff;
+use Staff;
 
 $options = getopt("hb");
 if (empty($options)) {

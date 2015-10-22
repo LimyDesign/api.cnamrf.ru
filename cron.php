@@ -23,31 +23,42 @@ if (empty($options)) {
 
 function resultRenewal($staff, $mode = false) {
 	$result = $staff->renewal($mode);
-	$test = 0;
 	$msg = array();
-	if (!empty($result)) {
-		$msg[] = log_data()." Обновление тарифов выполнено для следующих пользователей:\n";
-		foreach ($result as $userid => $details) {
-			foreach ($details as $data) {
-				if ($data['test'] === false) {
+	if ($mode) {
+		if (!empty($result)) {
+			$msg[] = log_data()." Обновление тарифов выполнено для следующих пользователей:\n";
+			foreach ($result as $userid => $details) {
+				foreach ($details as $data) {
 					$sum = 0;
 					if (isset($data['renew_sum_1'])) $sum += $data['renew_sum_1'];
 					if (isset($data['renew_sum_2'])) $sum += $data['renew_sum_2'];
 					$msg[] = log_data()."\t У пользователя #".$userid." было снято ".$sum." руб.\n";
-				} else {
-					$test++;
 				}
 			}
-		}
 
-		if ($test) {
-			$msg[] = log_data()." Отправляем пользователям уведомления, если есть кому.\n";
-			$msg[] = log_data()." Переключаемся на проверку реальных обновлений.\n";
-			resultRenewal($staff, true);
+			if ($test) {
+				$msg[] = log_data()." Отправляем пользователям уведомления, если есть кому.\n";
+				$msg[] = log_data()." Переключаемся на проверку реальных обновлений.\n";
+				resultRenewal($staff, true);
+			}
+		} else {
+			$msg[] = log_data()." Нет пользователей для обновления тарифов.\n";
 		}
 	} else {
-		$msg[] = log_data()." Нет пользователей для обновления тарифов.\n";
+		if (!empty($result)) {
+			$msg[] = log_data()." Отправляем пользователям уведомления:\n";
+			foreach ($result as $userid => $details) {
+				foreach ($details as $data) {
+					$msg[] = log_data()."\t Пользователь #".$userid." получил уведомление.\n";
+				}
+			}
+		} else {
+			$msg[] = log_data()." Нет пользователей для уведомления.\n";
+		}
+		$msg[] = log_data()." Переключаемся на проверку реальных обновлений.\n";
+		resultRenewal($staff, true);
 	}
+	
 	return implode('', $msg);
 }
 

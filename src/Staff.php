@@ -14,7 +14,7 @@ interface StaffErrorsMsg
 
 class Staff implements StaffErrorsMsg
 {
-	static protected $db;
+	static private $db;
 	private $dsn, $username, $password;
 
 	public function __construct($username, $password, $host, $database, $type) 

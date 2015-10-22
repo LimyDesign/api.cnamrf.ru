@@ -16,8 +16,8 @@ if (empty($options)) {
 	echo "\tphp ".__DIR__."/cron.php -b\n";
 	exit();
 } elseif (isset($options['b'])) {
-	echo log_data()." Выполняем проверку на продление тарифов...\n";
 	$staff = new Staff($conf['db']['username'], $conf['db']['password'], $conf['db']['host'], $conf['db']['database'], $conf['db']['type']);
+	echo log_data()." Выполняем проверку на продление тарифов...\n";
 	echo resultRenewal($staff);
 }
 

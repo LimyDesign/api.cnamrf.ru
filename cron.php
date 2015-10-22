@@ -17,7 +17,7 @@ if (empty($options)) {
 	exit();
 } elseif (isset($options['b'])) {
 	$staff = new Staff($conf['db']['username'], $conf['db']['password'], $conf['db']['host'], $conf['db']['database'], $conf['db']['type']);
-	echo log_data()." Выполняем проверку на продление тарифов...\n";
+	echo log_data()." Выполняем проверку на уведомление пользователей...\n";
 	echo resultRenewal($staff);
 }
 
@@ -49,7 +49,7 @@ function resultRenewal($staff, $mode = false) {
 		} else {
 			$msg[] = log_data()." Нет пользователей для уведомления.\n";
 		}
-		$msg[] = log_data()." Переключаемся на проверку реальных обновлений.\n";
+		$msg[] = log_data()." Переключаемся на проверку реальных обновлений...\n";
 		$msg[] = resultRenewal($staff, true);
 	}
 	

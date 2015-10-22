@@ -50,7 +50,7 @@ function resultRenewal($staff, $mode = false) {
 			$msg[] = log_data()." Нет пользователей для уведомления.\n";
 		}
 		$msg[] = log_data()." Переключаемся на проверку реальных обновлений.\n";
-		resultRenewal($staff, true);
+		$msg[] = resultRenewal($staff, true);
 	}
 	
 	return implode('', $msg);

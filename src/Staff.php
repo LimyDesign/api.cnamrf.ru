@@ -1,7 +1,5 @@
 <?php
 
-namespace Staff;
-
 interface StaffErrorsMsg
 {
 	const ERROR_CONNECT = 'Подключение не удалось: ',

@@ -10,7 +10,7 @@ interface StaffErrorsMsg
 		ERROR_ADD_ACTIVATE_TARIFF = 'Ошибка добавления данных об активации тарифа',
 		MSG_ACTIVATE_TARIFF = 'Активация тарифа ';
 
-	public function connect();
+	public function __construct($username, $password, $host, $database, $type);
 	public function renewal($test = true);
 }
 

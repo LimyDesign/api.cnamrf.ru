@@ -17,7 +17,7 @@ if (empty($options)) {
 	exit();
 } elseif (isset($options['b'])) {
 	echo log_data()." Выполняем проверку на продление тарифов...\n";
-	$staff = new Stuff($conf['db']['username'], $conf['db']['password'], $conf['db']['host'], $conf['db']['database'], $conf['db']['type']);
+	$staff = new Staff($conf['db']['username'], $conf['db']['password'], $conf['db']['host'], $conf['db']['database'], $conf['db']['type']);
 	echo resultRenewal($staff);
 }
 

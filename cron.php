@@ -41,6 +41,8 @@ function resultRenewal($staff, $mode = false) {
 		}
 
 		if ($test) {
+			$msg[] = log_data()." Отправляем пользователям уведомления, если есть кому.\n";
+			$msg[] = log_data()." Переключаемся на проверку реальных обновлений.\n";
 			resultRenewal($staff, true);
 		}
 	} else {

@@ -510,10 +510,17 @@ class API
             {
                 if ($qty)
                 {
-                    $query = "UPDATE users SET qty2 = qty2 - 1 WHERE id = :uid; SELECT json FROM cnam_cp WHERE id = :id;";
+                    $query = "UPDATE users SET qty2 = qty2 - 1 WHERE id = :uid";
                     try {
                         $sth = $db->prepare($query);
                         $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
+                        $sth->execute();
+                    } catch (\PDOException $e) {
+                        $this->exception($e);
+                    }
+                    $query = "SELECT json FROM cnam_cp WHERE id = :id";
+                    try {
+                        $sth = $db->prepare($query);
                         $sth->bindValue(':id', $id, \PDO::PARAM_INT);
                         $sth->execute();
                         $row = $sth->fetch();
@@ -720,7 +727,15 @@ class API
             }
             else
             {
-                $query = "UPDATE users SET qty = qty - 1 WHERE id = :uid; INSERT INTO log (uid, phone, credit, ip) VALUES (:uid, :number, :client, :ip)";
+                $query = "UPDATE users SET qty = qty - 1 WHERE id = :uid";
+                try {
+                    $sth = $db->prepare($query);
+                    $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
+                    $sth->execute();
+                } catch (\PDOException $e) {
+                    $this->exception($e);
+                }
+                $query = "INSERT INTO log (uid, phone, credit, ip) VALUES (:uid, :number, :client, :ip)";
                 try {
                     $sth = $db->prepare($query);
                     $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -766,7 +781,15 @@ class API
                 }
                 else
                 {
-                    $query = "UPDATE users SET qty = qty - 1 WHERE id = :uid; INSERT INTO log (uid, phone, client, ip) VALUES (:uid, :number, :client, :ip)";
+                    $query = "UPDATE users SET qty = qty - 1 WHERE id = :uid";
+                    try {
+                        $sth = $db->prepare($query);
+                        $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
+                        $sth->execute();
+                    } catch (\PDOException $e) {
+                        $this->exception($e);
+                    }
+                    $query = "INSERT INTO log (uid, phone, client, ip) VALUES (:uid, :number, :client, :ip)";
                     try {
                         $sth = $db->prepare($query);
                         $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -871,8 +894,15 @@ class API
                             }
                             else
                             {
-                                $query  = "UPDATE users SET qty = qty - 1 WHERE id = :uid;";
-                                $query .= "INSERT INTO log (uid, phone, client, ip) VALUES (:uid, :number, :client, :ip)";
+                                $query = "UPDATE users SET qty = qty - 1 WHERE id = :uid";
+                                try {
+                                    $sth = $db->prepare($query);
+                                    $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
+                                    $sth->execute();
+                                } catch (\PDOException $e) {
+                                    $this->exception($e);
+                                }
+                                $query = "INSERT INTO log (uid, phone, client, ip) VALUES (:uid, :number, :client, :ip)";
                                 try {
                                     $sth = $db->prepare($query);
                                     $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -884,8 +914,15 @@ class API
                                     $this->exception($e);
                                 }
                             }
-                            $query  = "UPDATE phone_cache SET modtime = now(), queries = queries +  1 WHERE number = :number;";
-                            $query .= "INSERT INTO phone_cache (number, name, translit) SELECT :number, :name, :translit WHERE NOT EXISTS (SELECT 1 FROM phone_cache WHERE number = :number)";
+                            $query = "UPDATE phone_cache SET modtime = now(), queries = queries +  1 WHERE number = :number";
+                            try {
+                                $sth = $db->prepare($query);
+                                $sth->bindValue(':number', $number, \PDO::PARAM_INT);
+                                $sth->execute();
+                            } catch (\PDOException $e) {
+                                $this->exception($e);
+                            }
+                            $query = "INSERT INTO phone_cache (number, name, translit) SELECT :number, :name, :translit WHERE NOT EXISTS (SELECT 1 FROM phone_cache WHERE number = :number)";
                             try {
                                 $sth = $db->prepare($query);
                                 $sth->bindValue(':number', $number, \PDO::PARAM_INT);
@@ -903,8 +940,15 @@ class API
                         }
                         else
                         {
-                            $query  = "UPDATE phones_notexists SET addtime = now() WHERE number = :number;";
-                            $query .= "INSERT INTO phones_notexists (number) SELECT :number WHERE NOT EXISTS (SELECT 1 FROM phones_notexists WHERE number = :number)";
+                            $query = "UPDATE phones_notexists SET addtime = now() WHERE number = :number";
+                            try {
+                                $sth = $db->prepare($query);
+                                $sth->bindValue(':number', $number, \PDO::PARAM_INT);
+                                $sth->execute();
+                            } catch (\PDOException $e) {
+                                $this->exception($e);
+                            }
+                            $query = "INSERT INTO phones_notexists (number) SELECT :number WHERE NOT EXISTS (SELECT 1 FROM phones_notexists WHERE number = :number)";
                             try {
                                 $sth = $db->prepare($query);
                                 $sth->bindValue(':number', $number, \PDO::PARAM_INT);

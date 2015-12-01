@@ -27,6 +27,7 @@ class API
         $this->usename = $conf['db']['username'];
         $this->password = $conf['db']['password'];
         $this->conf = $conf;
+        $this->connect();
     }
 
     /**

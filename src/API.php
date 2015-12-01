@@ -317,12 +317,10 @@ class API
                         $sth->bindValue(':text', $text, \PDO::PARAM_STR);
                         $sth->bindValue(':domain', $domain, \PDO::PARAM_STR);
                         $sth->execute();
-                        $count = $sth->rowCount();
                     } catch (\PDOException $e) {
                         $this->exception($e);
                     }
-                    if ($count)
-                        $json_message = $this->api2gisSearch($text, $cityName, $pageNum, $qty);
+                    $json_message = $this->api2gisSearch($text, $cityName, $pageNum, $qty);
                 }
                 else
                 {
@@ -338,12 +336,10 @@ class API
                             $sth->bindValue(':text', $text, \PDO::PARAM_STR);
                             $sth->bindValue(':domain', $domain, \PDO::PARAM_STR);
                             $sth->execute();
-                            $count = $sth->rowCount();
                         } catch (\PDOException $e) {
                             $this->exception($e);
                         }
-                        if ($count)
-                            $json_message = $this->api2gisSearch($text, $cityName, $pageNum, $qty);
+                        $json_message = $this->api2gisSearch($text, $cityName, $pageNum, $qty);
                     }
                     else
                     {
@@ -425,7 +421,6 @@ class API
                         $sth->bindValue(':ip', $uCIP, \PDO::PARAM_INT);
                         $sth->bindValue(':text', $rubric, \PDO::PARAM_STR);
                         $sth->bindValue(':domain', $domain, \PDO::PARAM_STR);
-                        $count = $sth->rowCount();
                     } catch (\PDOException $e) {
                         $this->exception($e);
                     }
@@ -445,7 +440,6 @@ class API
                             $sth->bindValue(':text', $rubric, \PDO::PARAM_STR);
                             $sth->bindValue(':domain', $domain, \PDO::PARAM_STR);
                             $sth->execute();
-                            $count = $sth->rowCount();
                         } catch (\PDOException $e) {
                             $this->exception($e);
                         }

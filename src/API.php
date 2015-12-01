@@ -182,7 +182,7 @@ class API
                     $query = "SELECT insertCities(array[:cities]) AS totalinsert";
                     try {
                         $sth = $db->prepare($query);
-                        $sth->bindValue(':cities', $this->array2csv($city_names, ',', "'", true));
+                        $sth->bindValue(':cities', $this->array2csv($city_names, ',', "'", true), \PDO::PARAM_LOB);
                         $sth->execute();
                         $row = $sth->fetch();
                     } catch (\PDOException $e) {

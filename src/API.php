@@ -429,8 +429,7 @@ class API
                     } catch (\PDOException $e) {
                         $this->exception($e);
                     }
-                    if ($count)
-                        $json_message = $this->api2gisSearch($rubric, $cityName, $pageNum, $qty, true);
+                    $json_message = $this->api2gisSearch($rubric, $cityName, $pageNum, $qty, true);
                 }
                 else
                 {
@@ -450,8 +449,7 @@ class API
                         } catch (\PDOException $e) {
                             $this->exception($e);
                         }
-                        if ($count)
-                            $json_message = $this->api2gisSearch($rubric, $cityName, $pageNum, $qty, true);
+                        $json_message = $this->api2gisSearch($rubric, $cityName, $pageNum, $qty, true);
                     }
                     else
                     {

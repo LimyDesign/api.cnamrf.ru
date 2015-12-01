@@ -292,7 +292,7 @@ class API
                 $this->exception($e);
             }
             $cityName = $row['name'];
-            $query = "SELECT t1.id, t1.qty2 + trunc((SELECT sum(t3.debet) - sum(t3.credit) FROM log t3 WHERE t3.uid = t1.id) / t2.price) AS qty, tariff.price FROM users t1 LEFT JOIN tariff t2 ON t1.tariffid2 = t2.id WHERE apikey = :apikey";
+            $query = "SELECT t1.id, t1.qty2 + trunc((SELECT sum(t3.debet) - sum(t3.credit) FROM log t3 WHERE t3.uid = t1.id) / t2.price) AS qty, t2.price FROM users t1 LEFT JOIN tariff t2 ON t1.tariffid2 = t2.id WHERE apikey = :apikey";
             try {
                 $sth = $db->prepare($query);
                 $sth->bindValue(':apikey', $apikey, \PDO::PARAM_STR);

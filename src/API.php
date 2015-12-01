@@ -155,51 +155,51 @@ class API
                 $sth->bindValue(':apikey', $apikey, \PDO::PARAM_STR);
                 $sth->execute();
                 $row = $sth->fetch();
-                $is_admin = $row['is_admin'];
-                if ($is_admin == 't')
-                {
-                    $url = 'http://catalog.api.2gis.ru/2.0/region/list?';
-                    $uri = http_build_query(
-                        array(
-                            'key' => $this->conf['2gis']['key'],
-                            'format' => 'json',
-                            'page_size' => '150'
-                        )
-                    );
-                    $dublgis = json_decode(file_get_contents($url.$uri));
-                    $total = $dublgis->result->total;
-                    if ($total)
-                    {
-                        $city_names = array();
-                        foreach ($dublgis->result->items as $city)
-                        {
-                            $city_names[] = $city->name;
-                        }
-                        $query = "SELECT insertCities(array[:cities]) as totalinsert";
-                        try {
-                            $sth = $db->prepare($query);
-                            $sth->bindValue(':cities', $this->array2csv($city_names, ',', "'", true));
-                            $sth->execute();
-                            $row = $sth->fetch();
-                            $json_message = array(
-                                'error' => '0',
-                                'total' => $total,
-                                'total_insert' => $row['totalinsert']
-                            );
-                        } catch (\PDOException $e) {
-                            $this->exception($e);
-                        }
-                    }
-                }
-                else
-                {
-                    $json_message = array(
-                        'error' => '6',
-                        'message' => 'Доступ запрещен.'
-                    );
-                }
             } catch (\PDOException $e) {
                 $this->exception($e);
+            }
+            $is_admin = $row['is_admin'];
+            if ($is_admin == 't')
+            {
+                $url = 'http://catalog.api.2gis.ru/2.0/region/list?';
+                $uri = http_build_query(
+                    array(
+                        'key' => $this->conf['2gis']['key'],
+                        'format' => 'json',
+                        'page_size' => '150'
+                    )
+                );
+                $dublgis = json_decode(file_get_contents($url.$uri));
+                $total = $dublgis->result->total;
+                if ($total)
+                {
+                    $city_names = array();
+                    foreach ($dublgis->result->items as $city)
+                    {
+                        $city_names[] = $city->name;
+                    }
+                    $query = "SELECT insertCities(array[:cities]) AS totalinsert";
+                    try {
+                        $sth = $db->prepare($query);
+                        $sth->bindValue(':cities', $this->array2csv($city_names, ',', "'", true));
+                        $sth->execute();
+                        $row = $sth->fetch();
+                    } catch (\PDOException $e) {
+                        $this->exception($e);
+                    }
+                    $json_message = array(
+                        'error' => '0',
+                        'total' => $total,
+                        'total_insert' => $row['totalinsert']
+                    );
+                }
+            }
+            else
+            {
+                $json_message = array(
+                    'error' => '6',
+                    'message' => 'Доступ запрещен.'
+                );
             }
         }
         else

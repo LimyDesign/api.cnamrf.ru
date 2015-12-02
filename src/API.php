@@ -10,7 +10,16 @@
 
 class API
 {
+    /**
+     * @var PDO $db;
+     */
     protected $db;
+    /**
+     * @var string $dsn
+     * @var string $username
+     * @var string $password
+     * @var array $conf
+     */
     private $dns, $usename, $password, $conf;
 
     /**
@@ -36,15 +45,13 @@ class API
      */
     private function connect()
     {
-        try
-        {
+        $db = null;
+        try {
             $db = new \PDO($this->dns, $this->usename, $this->password);
             $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $db->setAttribute(\PDO::ATTR_ORACLE_NULLS, \PDO::NULL_EMPTY_STRING);
             $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-        }
-        catch (\PDOException $e)
-        {
+        } catch (\PDOException $e) {
             $this->exception($e);
         }
         $this->db = $db;
@@ -82,6 +89,7 @@ class API
         $uAPIKey = preg_replace('/[^a-z0-9]/', '', $apikey);
         $uClient = $client;
         $uCIP = sprintf("%u", ip2long($remote_addr));
+        $json_message = array();
 
         if ($uAPIKey && $uClient && $uCIP && is_numeric($number))
         {
@@ -148,9 +156,12 @@ class API
     {
         $db = $this->db;
         $apikey = preg_replace('/[^a-z0-9]/', '', $apikey);
+        $json_message = array();
+
         if ($apikey)
         {
             $query = "SELECT is_admin FROM users WHERE apikey = :apikey";
+            $row = array();
             try {
                 $sth = $db->prepare($query);
                 $sth->bindValue(':apikey', $apikey, \PDO::PARAM_STR);
@@ -232,19 +243,21 @@ class API
                 $query = "SELECT id, name, translit, parent FROM rubrics WHERE (SELECT id FROM users WHERE apikey = :apikey) IS NOT NULL";
             else
                 $query = "SELECT id, name, translit FROM rubrics WHERE parent IS NULL AND (SELECT id FROM users WHERE apikey = :apikey) IS NOT NULL";
+            $rows = array();
             try {
                 $sth = $db->prepare($query);
                 $sth->bindValue(':apikey', $apikey, \PDO::PARAM_STR);
                 $sth->execute();
                 $rows = $sth->fetchAll();
-                foreach ($rows as $i => $row) {
-                    $rubrics[$i]['id'] = $row['id'];
-                    $rubrics[$i]['name'] = $row['name'];
-                    $rubrics[$i]['code'] = $row['translit'];
-                    if ($full) $rubrics[$i]['parent'] = $row['parent'];
-                }
             } catch (\PDOException $e) {
                 $this->exception($e);
+            }
+            $rubrics = array();
+            foreach ($rows as $i => $row) {
+                $rubrics[$i]['id'] = $row['id'];
+                $rubrics[$i]['name'] = $row['name'];
+                $rubrics[$i]['code'] = $row['translit'];
+                if ($full) $rubrics[$i]['parent'] = $row['parent'];
             }
             $json_message = array(
                 'error' => '0',
@@ -281,6 +294,7 @@ class API
         if ($apikey && $text && is_numeric($city))
         {
             $query = "SELECT name FROM cities WHERE id = :city";
+            $row = array();
             try {
                 $sth = $db->prepare($query);
                 $sth->bindValue(':city', $city, \PDO::PARAM_INT);
@@ -306,7 +320,7 @@ class API
             {
                 if ($qty)
                 {
-                    $query = 'INSERT INTO log (uid, client, ip, text, "domain") VALUES (:uid, :client, :ip, :text, :domain)';
+                    $query = 'INSERT INTO log (uid, client, ip, text, domain) VALUES (:uid, :client, :ip, :text, :domain)';
                     try {
                         $sth = $db->prepare($query);
                         $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -325,7 +339,7 @@ class API
                     $balance = $this->getUserBalance($uid);
                     if ($balance >= $price)
                     {
-                        $query = 'INSERT INTO log (uid, client, ip, text, "domain") VALUES (:uid, :client, :ip, :text, :domain)';
+                        $query = 'INSERT INTO log (uid, client, ip, text, domain) VALUES (:uid, :client, :ip, :text, :domain)';
                         try {
                             $sth = $db->prepare($query);
                             $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -386,6 +400,7 @@ class API
         if ($apikey && $rubric && is_numeric($city))
         {
             $query = "SELECT name FROM cities WHERE id = :city";
+            $row = array();
             try {
                 $sth = $db->prepare($query);
                 $sth->bindvalue(':city', $city, \PDO::PARAM_INT);
@@ -411,7 +426,7 @@ class API
             {
                 if ($qty)
                 {
-                    $query = 'INSERT INTO log (uid, client, ip, text, "domain") VALUES (:uid, :client, :ip, :text, :domain)';
+                    $query = 'INSERT INTO log (uid, client, ip, text, domain) VALUES (:uid, :client, :ip, :text, :domain)';
                     try {
                         $sth = $db->prepare($query);
                         $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -429,7 +444,7 @@ class API
                     $balance = $this->getUserBalance($uid);
                     if ($balance >= $price)
                     {
-                        $query = 'INSERT INTO log (uid, client, ip, text, "domain") VALUES (:uid, :client, :ip, :text, :domain)';
+                        $query = 'INSERT INTO log (uid, client, ip, text, domain) VALUES (:uid, :client, :ip, :text, :domain)';
                         try {
                             $sth = $db->prepare($query);
                             $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -493,6 +508,7 @@ class API
         if ($apikey && $hash && is_numeric($id))
         {
             $query = "SELECT users.id, users.qty2, tariff.price FROM users LEFT JOIN tariff ON users.tariffid2 = tariff.id WHERE apikey = :apikey";
+            $row = array();
             try {
                 $sth = $db->prepare($query);
                 $sth->bindValue(':apikey', $apikey, \PDO::PARAM_STR);
@@ -547,7 +563,7 @@ class API
                         $geoData = $this->api2gisGeo($lon, $lat);
                     else
                         $geoData = json_decode($gd_json);
-                    $query = 'INSERT INTO log (uid, client, ip, text, "domain") VALUES (:uid, :client, :ip, :text, :domain) RETURNING id';
+                    $query = 'INSERT INTO log (uid, client, ip, text, domain) VALUES (:uid, :client, :ip, :text, :domain) RETURNING id';
                     try {
                         $sth = $db->prepare($query);
                         $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -611,7 +627,7 @@ class API
                             $geoData = $this->api2gisGeo($lon, $lat);
                         else
                             $geoData = json_decode($gd_json);
-                        $query = 'INSERT INTO log (uid, credit, client, ip, text, "domain") VALUES (:uid, :price, :client, :ip, :text, :domain) RETURNING id';
+                        $query = 'INSERT INTO log (uid, credit, client, ip, text, domain) VALUES (:uid, :price, :client, :ip, :text, :domain) RETURNING id';
                         try {
                             $sth = $db->prepare($query);
                             $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -696,7 +712,9 @@ class API
     private function getData($number, $uid, $uClient, $uCIP, $price = 0)
     {
         $db = $this->db;
+        $json_message = array();
         $query = "SELECT name, translit FROM phonebook WHERE phone = :number AND verify = TRUE";
+        $row = array();
         try {
             $sth = $db->prepare($query);
             $sth->bindValue(':number', $number, \PDO::PARAM_INT);
@@ -1091,7 +1109,7 @@ class API
             . "<li><a href='http://2gis.ru/city/{$cp->project_id}/firm/{$cp->id}/entrance/center/{$cp->lon}%2C{$cp->lat}/zoom/17?utm_source=profile&utm_medium=entrance&utm_campaing=partnerapi' target='_blank'>Показать вход</a></li>"
             . "<li><a href='http://2gis.ru/city/{$cp->project_id}/firm/{$cp->id}/photos/{$cp->id}/center/{$cp->lon}%2C{$cp->lat}/zoom/17?utm_source=profile&utm_medium=photo&utm_campaing=partnerapi' target='_blank'>Фотографии {$cp->name}</a></li>"
             . "<li><a href='http://2gis.ru/city/{$cp->project_id}/firm/{$cp->id}/flamp/{$cp->id}/callout/firms-{$cp->id}/center/{$cp->lon}%2C{$cp->lat}/zoom/17?utm_source=profile&utm_medium=review&utm_campaing=partnerapi' target='_blank'>Отзывы о {$cp->name}</a>";
-        $addittional_info_service_price = "<li><a href='{cp->bookle_url}?utm_source=profile&utm_medium=booklet&utm_campaing=partnerapi' target='_blank'>Услуги и цены {$cp->name}</a></li>";
+        $addittional_info_service_price = "<li><a href='{$cp->bookle_url}?utm_source=profile&utm_medium=booklet&utm_campaing=partnerapi' target='_blank'>Услуги и цены {$cp->name}</a></li>";
         if ($json_message['comments'])
             $json_message['comments'] .= $addittional_info;
         else
@@ -1119,6 +1137,7 @@ class API
             $query = "SELECT parent FROM rubrics WHERE name = :name";
             foreach ($rubrics as $rubric)
             {
+                $row = array();
                 try {
                     $sth = $db->prepare($query);
                     $sth->bindValue(':name', $rubric, \PDO::PARAM_STR);
@@ -1144,6 +1163,7 @@ class API
                     $parrents[] = $parent_id1;
             }
             $main_parent = $main_parent2 = array_count_values($parrents);
+            $pid = 0;
             arsort($main_parent2);
             foreach ($main_parent2 as $parent_id => $count) {
                 if ($count > 1)
@@ -1153,6 +1173,7 @@ class API
                 break;
             }
             $query = "SELECT name, translit FROM rubrics WHERE id = :id";
+            $row = array();
             try {
                 $sth = $db->prepare($query);
                 $sth->bindValue(':id', $pid, \PDO::PARAM_INT);
@@ -1295,6 +1316,7 @@ class API
     {
         $db = $this->db;
         $query = "SELECT (sum(debet) - sum(credit)) AS balance FROM log WHERE uid = :uid";
+        $row = array();
         try {
             $sth = $db->prepare($query);
             $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);

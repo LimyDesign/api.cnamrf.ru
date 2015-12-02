@@ -189,7 +189,7 @@ class API
                     $json_message = array(
                         'error' => '0',
                         'total' => $total,
-                        'total_insert' => $row['totalinsert']
+                        'total_insert' => $row->totalinsert
                     );
                 }
             }

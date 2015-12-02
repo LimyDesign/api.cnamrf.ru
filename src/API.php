@@ -180,7 +180,7 @@ class API
                         $city_names[] = $city->name;
                     }
                     $cities = $this->array2csv($city_names, ',', "'", true);
-                    $query = "SELECT insertCities(array[:cities]) AS totalinsert";
+                    $query = "SELECT insertCities(array[{$cities}]) AS totalinsert";
                     try {
                         $row = $db->query($query);
                     } catch (\PDOException $e) {

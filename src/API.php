@@ -179,12 +179,10 @@ class API
                     {
                         $city_names[] = $city->name;
                     }
+                    $cities = $this->array2csv($city_names, ',', "'", true);
                     $query = "SELECT insertCities(array[:cities]) AS totalinsert";
                     try {
-                        $sth = $db->prepare($query);
-                        $sth->bindValue(':cities', $this->array2csv($city_names, ',', "'", true), \PDO::PARAM_LOB);
-                        $sth->execute();
-                        $row = $sth->fetch();
+                        $row = $db->query($query);
                     } catch (\PDOException $e) {
                         $this->exception($e);
                     }

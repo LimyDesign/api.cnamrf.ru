@@ -532,7 +532,7 @@ class API
                     } catch (\PDOException $e) {
                         $this->exception($e);
                     }
-                    $query = "SELECT json FROM cnam_cp WHERE id = :id";
+                    $query = "SELECT json, hash FROM cnam_cp WHERE id = :id";
                     try {
                         $sth = $db->prepare($query);
                         $sth->bindValue(':id', $id, \PDO::PARAM_INT);
@@ -544,8 +544,10 @@ class API
                     $cp_json = $row['json'];
                     if (!$cp_json || $getFrom2GIS)
                         $dublgis = $this->api2gisProfile($id, $hash);
-                    else
+                    else {
                         $dublgis = json_decode($cp_json);
+                        $hash = $row['hash'];
+                    }
                     $lon = $dublgis->lon;
                     $lat = $dublgis->lat;
                     $query = "SELECT json FROM geodata WHERE lon = :lon AND lat = :lat";

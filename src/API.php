@@ -1414,7 +1414,10 @@ class API
         $json_message = json_encode(
             array(
                 'error' => $e->getCode(),
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
             )
         );
         die($json_message);

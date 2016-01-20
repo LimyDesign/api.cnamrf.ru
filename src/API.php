@@ -1136,16 +1136,15 @@ class API
         if (count($rubrics))
         {
             $parrents = array();
-            $query = "SELECT parent FROM rubrics WHERE name = ':name'";
             foreach ($rubrics as $rubric)
             {
                 $row = array();
+                $query = "SELECT parent FROM rubrics WHERE name = :name";
                 try {
-                    $query = str_replace(':name', $rubric, $query);
-//                    $sth = $db->prepare($query);
-//                    $sth->bindValue(':name', $rubric, \PDO::PARAM_STR);
-//                    $sth->execute();
-                    $row = $db->query($query);
+                    $sth = $db->prepare($query);
+                    $sth->bindValue(':name', $rubric, \PDO::PARAM_STR);
+                    $sth->execute();
+                    $row = $sth->fetch();
                 } catch (\PDOException $e) {
                     $this->exception($e, $rubric);
                 }

@@ -1142,10 +1142,10 @@ class API
                 $row = array();
                 try {
                     $query = str_replace(':name', $rubric, $query);
-                    $sth = $db->prepare($query);
+//                    $sth = $db->prepare($query);
 //                    $sth->bindValue(':name', $rubric, \PDO::PARAM_STR);
-                    $sth->execute();
-                    $row = $sth->fetch();
+//                    $sth->execute();
+                    $row = $db->query($query);
                 } catch (\PDOException $e) {
                     $this->exception($e, $rubric);
                 }

@@ -1146,7 +1146,7 @@ class API
                     $sth->execute();
                     $row = $sth->fetch();
                 } catch (\PDOException $e) {
-                    $this->exception($e);
+                    $this->exception($e, $rubric);
                 }
                 $parent_id1 = $row['parent'];
                 $query = "SELECT parent FROM rubrics WHERE id = :id";
@@ -1409,7 +1409,7 @@ class API
      *
      * @param object $e Объект класса исключения
      */
-    private function exception ($e)
+    private function exception ($e, $additional = null)
     {
         $json_message = json_encode(
             array(
@@ -1418,6 +1418,7 @@ class API
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
+                'additional' => $additional,
             )
         );
         die($json_message);

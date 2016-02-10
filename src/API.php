@@ -320,7 +320,7 @@ class API
             {
                 if ($qty)
                 {
-                    $query = 'INSERT INTO log (uid, client, ip, text, domain) VALUES (:uid, :client, :ip, :text, :domain)';
+                    $query = 'INSERT INTO log (uid, client, ip, text, domain, is_search) VALUES (:uid, :client, :ip, :text, :domain, TRUE)';
                     try {
                         $sth = $db->prepare($query);
                         $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -339,7 +339,7 @@ class API
                     $balance = $this->getUserBalance($uid);
                     if ($balance >= $price)
                     {
-                        $query = 'INSERT INTO log (uid, client, ip, text, domain) VALUES (:uid, :client, :ip, :text, :domain)';
+                        $query = 'INSERT INTO log (uid, client, ip, text, domain, is_search) VALUES (:uid, :client, :ip, :text, :domain, TRUE)';
                         try {
                             $sth = $db->prepare($query);
                             $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -426,7 +426,7 @@ class API
             {
                 if ($qty)
                 {
-                    $query = 'INSERT INTO log (uid, client, ip, text, domain) VALUES (:uid, :client, :ip, :text, :domain)';
+                    $query = 'INSERT INTO log (uid, client, ip, text, domain, is_search) VALUES (:uid, :client, :ip, :text, :domain, TRUE)';
                     try {
                         $sth = $db->prepare($query);
                         $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
@@ -444,7 +444,7 @@ class API
                     $balance = $this->getUserBalance($uid);
                     if ($balance >= $price)
                     {
-                        $query = 'INSERT INTO log (uid, client, ip, text, domain) VALUES (:uid, :client, :ip, :text, :domain)';
+                        $query = 'INSERT INTO log (uid, client, ip, text, domain, is_search) VALUES (:uid, :client, :ip, :text, :domain, TRUE)';
                         try {
                             $sth = $db->prepare($query);
                             $sth->bindValue(':uid', $uid, \PDO::PARAM_INT);
